@@ -1,0 +1,10 @@
+<resources>
+	<string name="activity_file_selector_jump_to">Jump to...</string>
+	<string name="activity_file_selector_the_directory_does_not_exist_or_is_inaccessible">The directory does not exist or is inaccessible.</string>
+	<string name="activity_main_load_chart">Load chart</string>
+	<string name="app_name">Malody2Phigros</string>
+	<string name="crash_cancel">Quit directly</string>
+	<string name="crash_ok">Copy the error message then quit</string>
+	<string name="crash_title">PhigrOS Crashed</string>
+	<string name="title_file_selector">File Selector</string>
+</resources>

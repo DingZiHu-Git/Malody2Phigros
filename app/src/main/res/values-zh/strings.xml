@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="activity_file_selector_jump_to">跳转到……</string>
+	<string name="activity_file_selector_the_directory_does_not_exist_or_is_inaccessible">目录不存在或无法访问。</string>
+	<string name="activity_main_load_chart">加载谱面</string>
+	<string name="crash_cancel">直接退出</string>
+	<string name="crash_ok">复制报错后退出</string>
+	<string name="crash_title">PhigrOS已崩溃</string>
+	<string name="title_file_selector">文件选择器</string>
+</resources>
