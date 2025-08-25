@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:orientation="horizontal"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:paddingLeft="8dp">
+
+		<TextView
+			android:id="@+id/chart_list_item_title"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+		<TextView
+			android:id="@+id/chart_list_item_description"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+
+	</LinearLayout>
+
+	<Switch
+		android:id="@+id/chart_list_item_check"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:clickable="false"
+		android:focusable="false"/>
+
+</LinearLayout>
+

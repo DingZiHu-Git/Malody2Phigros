@@ -8,4 +8,28 @@
 		android:icon="@drawable/ic_add"
 		android:title="@string/activity_main_load_chart"/>
 
+	<item
+		android:id="@+id/activity_main_start_convert"
+		android:showAsAction="ifRoom"
+		android:icon="@drawable/ic_send"
+		android:title="@string/activity_main_start_convert"/>
+
+	<item
+		android:id="@+id/activity_main_clear_loaded_chart"
+		android:showAsAction="ifRoom"
+		android:icon="@drawable/ic_trash"
+		android:title="@string/activity_main_clear_loaded_chart"/>
+
+	<item
+		android:id="@+id/activity_main_save_properties"
+		android:showAsAction="ifRoom"
+		android:icon="@drawable/ic_content_save"
+		android:title="@string/activity_main_save_properties"/>
+
+	<item
+		android:id="@+id/activity_main_settings"
+		android:showAsAction="ifRoom"
+		android:icon="@drawable/ic_settings"
+		android:title="@string/activity_main_settings"/>
+
 </menu>

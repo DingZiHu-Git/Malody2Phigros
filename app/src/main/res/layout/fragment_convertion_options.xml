@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fillViewport="true">
+
+	<LinearLayout
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="top">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/fragment_convertion_options_general"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:padding="8dp"/>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"/>
+
+		<Switch
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="@string/fragment_convertion_options_enable_const"
+			android:textSize="16sp"
+			android:id="@+id/fragment_convertion_options_enable_const"/>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left|center">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/fragment_convertion_options_default_speed"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:padding="8dp"
+				android:textSize="16sp"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:inputType="numberDecimal|numberSigned"
+				android:layout_height="wrap_content"
+				android:id="@+id/fragment_convertion_options_default_speed"
+				android:text="10.0"
+				android:layout_weight="1.0"/>
+
+			<ImageButton
+				android:layout_width="32dp"
+				style="?android:attr/buttonBarButtonStyle"
+				android:layout_height="32dp"
+				android:src="@drawable/ic_check"
+				android:id="@+id/fragment_convertion_options_default_speed_confirm"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left|center">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/fragment_convertion_options_default_y"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:padding="8dp"
+				android:textSize="16sp"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:inputType="numberDecimal|numberSigned"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:text="-278.15"
+				android:id="@+id/fragment_convertion_options_default_y"/>
+
+			<ImageButton
+				android:layout_width="32dp"
+				style="?android:attr/buttonBarButtonStyle"
+				android:layout_height="32dp"
+				android:src="@drawable/ic_check"
+				android:id="@+id/fragment_convertion_options_default_y_confirm"/>
+
+		</LinearLayout>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Key"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:padding="8dp"/>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"/>
+
+		<Switch
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="@string/fragment_convertion_options_enable_luck"
+			android:textSize="16sp"
+			android:id="@+id/fragment_convertion_options_enable_luck"/>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_width="wrap_content"
+			android:layout_height="1dp"/>
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Slide"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:padding="8dp"/>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"/>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left|center">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/fragment_convertion_options_default_size"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:padding="8dp"
+				android:textSize="16sp"/>
+
+			<SeekBar
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:id="@+id/fragment_convertion_options_default_size"
+				android:layout_weight="1.0"/>
+
+			<TextView
+				android:layout_width="48dp"
+				android:layout_height="wrap_content"
+				android:text="0"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textSize="16sp"
+				android:padding="8dp"
+				android:id="@+id/fragment_convertion_options_default_size_value"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left|center">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/fragment_convertion_options_slide_process_mode"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:padding="8dp"
+				android:textSize="16sp"/>
+
+			<Spinner
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:id="@+id/fragment_convertion_options_slide_process_mode"/>
+
+		</LinearLayout>
+
+		<Switch
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="@string/fragment_convertion_options_enable_drag"
+			android:id="@+id/fragment_convertion_options_enable_drag"
+			android:textSize="16sp"/>
+
+		<Switch
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:padding="8dp"
+			android:text="@string/fragment_convertion_options_fake_drag"
+			android:textSize="16sp"
+			android:id="@+id/fragment_convertion_options_fake_drag"/>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left|center">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/fragment_convertion_options_drag_alpha"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textSize="16sp"
+				android:padding="8dp"/>
+
+			<SeekBar
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:id="@+id/fragment_convertion_options_drag_alpha"
+				android:layout_weight="1.0"/>
+
+			<TextView
+				android:layout_width="48dp"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:padding="8dp"
+				android:textSize="16sp"
+				android:id="@+id/fragment_convertion_options_drag_alpha_value"
+				android:text="0"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left|center">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:padding="8dp"
+				android:text="@string/fragment_convertion_options_drag_interval"
+				android:textSize="16sp"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:inputType="number"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:text="0"
+				android:id="@+id/fragment_convertion_options_drag_interval_num"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text=":"
+				android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:inputType="number"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:text="1"
+				android:id="@+id/fragment_convertion_options_drag_interval_up"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="/"
+				android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+			<EditText
+				android:layout_width="match_parent"
+				android:inputType="number"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:text="12"
+				android:id="@+id/fragment_convertion_options_drag_interval_down"/>
+
+			<ImageButton
+				android:layout_width="32dp"
+				style="?android:attr/buttonBarButtonStyle"
+				android:layout_height="32dp"
+				android:src="@drawable/ic_check"
+				android:id="@+id/fragment_convertion_options_drag_interval_confirm"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</ScrollView>
+
