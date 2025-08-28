@@ -134,7 +134,7 @@ public class MalodyChart extends Chart {
 			for (int i = 0; i < note.length(); i++) {
 				JSONObject jo = note.getJSONObject(i);
 				if (jo.has("sound")) continue;
-				double size = cof.defaultWide == 0 ? 1d : Math.max(jo.getInt("w"), 19) / (double) cof.defaultWide;
+				double size = cof.defaultWide == 0 ? 1d : Math.max(jo.has("w") ? jo.getInt("w") : 50, 19) / (double) cof.defaultWide;
 				double x = ((jo.has("x") ? jo.getInt("x") : 0) - 127.5) / 127.5 * 675d;
 				if (jo.has("seg")) {
 					Fraction beat = new Fraction(jo.getJSONArray("beat"));
