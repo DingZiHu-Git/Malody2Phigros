@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.UriPermission;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,14 +27,18 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.io.IOException;
+import org.json.JSONException;
 
 public class MainActivity extends AppCompatActivity {
 	private WaitDialog wait;
@@ -122,75 +128,82 @@ public class MainActivity extends AppCompatActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
-			case 1:
-				new Thread(new Runnable() {
-						@Override
-						public void run() {
-							try {
+				case 1:
+					new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
 								String name = DocumentFile.fromSingleUri(MainActivity.this, data.getData()).getName();
-								if (name.toLowerCase().endsWith(".mc") || name.toLowerCase().endsWith(".osu")) FileUtil.copy(getContentResolver().openInputStream(data.getData()), getFilesDir().getAbsolutePath() + File.separator + name, new byte[1024 * 1024 * 4]);
-								else if (name.toLowerCase().endsWith(".mcz") || name.toLowerCase().endsWith(".osz") || name.toLowerCase().endsWith(".zip")) {
-									List<String> targets = new ArrayList<>();
-									ZipInputStream zis = new ZipInputStream(getContentResolver().openInputStream(data.getData()));
-									ZipEntry ze;
-									while ((ze = zis.getNextEntry()) != null) {
-										FileOutputStream fos = new FileOutputStream(getCacheDir().getAbsolutePath() + File.separator + ze.getName().substring(ze.getName().lastIndexOf("/") + 1));
-										byte[] b = new byte[1024 * 1024 * 4];
-										int len;
-										while ((len = zis.read(b)) > -1) fos.write(b, 0, len);
-										fos.close();
-										if (ze.getName().toLowerCase().endsWith(".mc") || ze.getName().toLowerCase().endsWith(".osu")) targets.add(ze.getName().substring(ze.getName().lastIndexOf("/") + 1));
-										zis.closeEntry();
-									}
-									zis.close();
-									if (targets.size() > 0) {
-										for (String str : targets) {
-											File temp = new File(getFilesDir().getAbsolutePath() + File.separator + str);
-											if (str.toLowerCase().endsWith(".mc")) {
-												temp.mkdirs();
-												File file = new File(getCacheDir().getAbsolutePath() + File.separator + str);
-												File f = new File(temp.getAbsolutePath() + File.separator + str);
-												file.renameTo(f);
-												MalodyChart mc = new MalodyChart(f);
-												FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + mc.background, temp.getAbsolutePath() + File.separator + mc.background, new byte[1024 * 1024 * 4]);
-												FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + mc.sound, temp.getAbsolutePath() + File.separator + mc.sound, new byte[1024 * 1024 * 4]);
-											} else if (str.toLowerCase().endsWith(".osu")) {
-												temp.mkdirs();
-												File file = new File(getCacheDir().getAbsolutePath() + File.separator + str);
-												File f = new File(temp.getAbsolutePath() + File.separator + str);
-												file.renameTo(f);
-												OsuChart oc = new OsuChart(f);
-												FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + oc.background, temp.getAbsolutePath() + File.separator + oc.background, new byte[1024 * 1024 * 4]);
-												FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + oc.sound, temp.getAbsolutePath() + File.separator + oc.sound, new byte[1024 * 1024 * 4]);
-											}
+									if (name.toLowerCase().endsWith(".mc") || name.toLowerCase().endsWith(".osu")) FileUtil.copy(getContentResolver().openInputStream(data.getData()), getFilesDir().getAbsolutePath() + File.separator + name, new byte[1024 * 1024 * 4]);
+									else if (name.toLowerCase().endsWith(".mcz") || name.toLowerCase().endsWith(".osz") || name.toLowerCase().endsWith(".zip")) {
+										List<String> targets = new ArrayList<>();
+										ZipInputStream zis = new ZipInputStream(getContentResolver().openInputStream(data.getData()));
+										ZipEntry ze;
+										while ((ze = zis.getNextEntry()) != null) {
+											FileOutputStream fos = new FileOutputStream(getCacheDir().getAbsolutePath() + File.separator + ze.getName().substring(ze.getName().lastIndexOf("/") + 1));
+											byte[] b = new byte[1024 * 1024 * 4];
+											int len;
+											while ((len = zis.read(b)) > -1) fos.write(b, 0, len);
+											fos.close();
+											if (ze.getName().toLowerCase().endsWith(".mc") || ze.getName().toLowerCase().endsWith(".osu")) targets.add(ze.getName().substring(ze.getName().lastIndexOf("/") + 1));
+											zis.closeEntry();
 										}
-									} else {
-										runOnUiThread(new Runnable() {
-												@Override
-												public void run() {
-													new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_load_chart_failed_title).setMessage(R.string.activity_main_load_chart_failed_couldnt_find_chart_file).setPositiveButton(android.R.string.ok, null).show();
+										zis.close();
+										if (targets.size() > 0) {
+											for (String str : targets) {
+												File temp = new File(getFilesDir().getAbsolutePath() + File.separator + str);
+												if (str.toLowerCase().endsWith(".mc")) {
+													temp.mkdirs();
+													File file = new File(getCacheDir().getAbsolutePath() + File.separator + str);
+													File f = new File(temp.getAbsolutePath() + File.separator + str);
+													file.renameTo(f);
+													MalodyChart mc = new MalodyChart(f);
+													if (mc.background != null) FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + mc.background, temp.getAbsolutePath() + File.separator + mc.background, new byte[1024 * 1024 * 4]);
+													FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + mc.sound, temp.getAbsolutePath() + File.separator + mc.sound, new byte[1024 * 1024 * 4]);
+												} else if (str.toLowerCase().endsWith(".osu")) {
+													temp.mkdirs();
+													File file = new File(getCacheDir().getAbsolutePath() + File.separator + str);
+													File f = new File(temp.getAbsolutePath() + File.separator + str);
+													file.renameTo(f);
+													OsuChart oc = new OsuChart(f);
+													if (oc.background != null) FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + oc.background, temp.getAbsolutePath() + File.separator + oc.background, new byte[1024 * 1024 * 4]);
+													FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + oc.sound, temp.getAbsolutePath() + File.separator + oc.sound, new byte[1024 * 1024 * 4]);
 												}
 											}
-										);
-									}
-									for (File f : getCacheDir().listFiles()) f.delete();
-								} else runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_load_chart_failed_title).setMessage(R.string.activity_main_load_chart_failed_unsupported_file_type).setPositiveButton(android.R.string.ok, null).show();
+										} else {
+											runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_load_chart_failed_title).setMessage(R.string.activity_main_load_chart_failed_couldnt_find_chart_file).setPositiveButton(android.R.string.ok, null).show();
+													}
+												}
+											);
 										}
-									}
-								);
-								clf.refresh();
-								wait.cancel();
-							} catch (Exception e) {
-								catcher(e);
+										for (File f : getCacheDir().listFiles()) f.delete();
+									} else runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_load_chart_failed_title).setMessage(R.string.activity_main_load_chart_failed_unsupported_file_type).setPositiveButton(android.R.string.ok, null).show();
+											}
+										}
+									);
+									clf.refresh();
+									wait.cancel();
+								} catch (Exception e) {
+									catcher(e);
+								}
 							}
 						}
+					, "LoadCharts").start();
+					wait.show();
+					break;
+				case 2:
+					try {
+						getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+					} catch (Exception e) {
+						catcher(e);
 					}
-				, "LoadCharts").start();
-				wait.show();
-				break;
+					break;
 			}
 		}
 	}
@@ -220,19 +233,41 @@ public class MainActivity extends AppCompatActivity {
 				wait.show();
 				return true;
 			case R.id.activity_main_start_convert:
-				new Thread(new Runnable() {
+				final List<UriPermission> permissions = getContentResolver().getPersistedUriPermissions();
+				final String[] accessibleDirs = new String[permissions.size() + 1];
+				for (int i = 0; i < permissions.size(); i++) accessibleDirs[i] = DocumentFile.fromTreeUri(MainActivity.this, permissions.get(i).getUri()).getName();
+				accessibleDirs[accessibleDirs.length - 1] = getString(R.string.activity_main_select_folder);
+				new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_select_save_location).setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, accessibleDirs), new DialogInterface.OnClickListener() {
 						@Override
-						public void run() {
-							try {
-								//TODO: Complete the convertion code.
-								wait.cancel();
-							} catch (Exception e) {
-								catcher(e);
+						public void onClick(DialogInterface dialog, final int which) {
+							if (which == accessibleDirs.length - 1) startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 2);
+							else {
+								final ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+								clf.convert(es, cof, permissions.get(which).getUri());
+								new Thread(new Runnable() {
+										@Override
+										public void run() {
+											try {
+												es.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+												wait.cancel();
+											} catch (Exception e) {
+												catcher(e);
+											}
+										}
+									}
+								, "Convert").start();
+								wait.show();
 							}
 						}
 					}
-				, "Convert").start();
-				wait.show();
+				).show();
+				return true;
+			case R.id.activity_main_save_properties:
+				try {
+					cof.saveProperties();
+				} catch (Exception e) {
+					catcher(e);
+				}
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

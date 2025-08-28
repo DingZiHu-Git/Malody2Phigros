@@ -1,5 +1,6 @@
 package com.dzh.m2p;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +13,9 @@ public class FileUtil {
 	}
 	public static void copy(InputStream is, String dest, byte[] b) throws IOException {
 		copy(is, new FileOutputStream(dest), b);
+	}
+	public static void copy(String file, OutputStream os, byte[] b) throws IOException {
+		copy(new FileInputStream(file), os, b);
 	}
 	public static void copy(InputStream is, OutputStream os, byte[] b) throws IOException {
 		int len;

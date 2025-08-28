@@ -9,6 +9,8 @@
 	<string name="activity_main_permissions_request_message">本应用为转谱器，需要读写权限来访问设备的内部存储。这不会被用于其他用途。如果你不同意授予权限，请点击“取消”退出应用。</string>
 	<string name="activity_main_save_properties">保存配置</string>
 	<string name="activity_main_settings">设置</string>
+	<string name="activity_main_select_folder">选择文件夹……</string>
+	<string name="activity_main_select_save_location">选择保存位置：</string>
 	<string name="activity_main_start_convert">开始转换</string>
 	<string name="activity_main_tab_chart_list">谱面列表</string>
 	<string name="activity_main_tab_convertion_options">转谱选项</string>
@@ -27,13 +29,16 @@
 	<string name="crash_cancel">直接退出</string>
 	<string name="crash_ok">复制报错后退出</string>
 	<string name="crash_title">PhigrOS已崩溃</string>
+	<string name="fragment_chart_list_delete_chart">删除谱面</string>
 	<string name="fragment_chart_list_description_artist">艺术家：</string>
 	<string name="fragment_chart_list_description_creator">作者：</string>
 	<string name="fragment_chart_list_description_mode">模式：</string>
 	<string name="fragment_chart_list_description_title">歌曲名：</string>
 	<string name="fragment_chart_list_description_version">版本：</string>
+	<string name="fragment_chart_list_modify_title">修改标识：</string>
 	<string name="fragment_chart_list_no_loaded_chart">没有已加载的谱面。请点击“+”按钮来加载一张。</string>
-	<string name="fragment_convertion_options_default_size">默认音符尺寸：</string>
+	<string name="fragment_chart_list_pack_converted_chart">打包已转换谱面</string>
+	<string name="fragment_convertion_options_default_wide">默认音符宽度：</string>
 	<string name="fragment_convertion_options_default_speed">默认速度：</string>
 	<string name="fragment_convertion_options_default_y">判定线默认Y坐标：</string>
 	<string name="fragment_convertion_options_drag_alpha">Drag透明度：</string>
@@ -46,14 +51,15 @@
 	<string name="fragment_convertion_options_invisible_line_message">你输入的Y坐标会使判定线不可见。这可能导致谱面无法游玩。你确定要保留这个值吗？</string>
 	<string name="fragment_convertion_options_invisible_line_yes">是的，我想保留</string>
 	<string name="fragment_convertion_options_invisible_line_no">不，帮我改回默认</string>
+	<string name="fragment_convertion_options_is_cover">判定线覆盖</string>
 	<string name="fragment_convertion_options_negative_speed_message">你输入了一个负数速度。这可能导致谱面无法游玩。你确定要保留这个值吗？</string>
 	<string name="fragment_convertion_options_negative_speed_yes">是的，我想保留</string>
 	<string name="fragment_convertion_options_negative_speed_no">不，帮我改成正数</string>
+	<string name="fragment_convertion_options_note">注：修改默认音符宽度为0会使转谱器忽略原谱中所有音符的宽度属性。osu!mania转谱器仍在开发中。</string>
 	<string name="fragment_convertion_options_slide_process_mode">Slide处理模式：</string>
 	<string name="fragment_convertion_options_slide_mode_moving_hold">转换为移动的Hold</string>
 	<string name="fragment_convertion_options_slide_mode_straight_hold">转换为直Hold</string>
 	<string name="fragment_convertion_options_slide_mode_tap_with_drags">转换为Tap+一堆Drag</string>
-	<string name="fragment_convertion_options_warning">警告！</string>
 	<string name="please_wait">请稍候……</string>
 	<string name="unknown">未知</string>
 </resources>

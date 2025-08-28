@@ -8,6 +8,8 @@
 	<string name="activity_main_permissions_request_message">The application is a chart converter, which needs read and write permissions to access the external storage of the device. This won\'t be used for other purposes. If you don\'t allow to grant the permissions, please click "CANCEL" to exit the application.</string>
 	<string name="activity_main_save_properties">Save properties</string>
 	<string name="activity_main_settings">Settings</string>
+	<string name="activity_main_select_folder">Select folder...</string>
+	<string name="activity_main_select_save_location">Select save location: </string>
 	<string name="activity_main_start_convert">Start convert</string>
 	<string name="activity_main_tab_chart_list">Chart List</string>
 	<string name="activity_main_tab_convertion_options">Convertion Options</string>
@@ -27,13 +29,16 @@
 	<string name="crash_cancel">Quit directly</string>
 	<string name="crash_ok">Copy the error message then quit</string>
 	<string name="crash_title">PhigrOS crashed</string>
+	<string name="fragment_chart_list_delete_chart">Delete chart</string>
 	<string name="fragment_chart_list_description_artist">Artist: </string>
 	<string name="fragment_chart_list_description_creator">Creator: </string>
 	<string name="fragment_chart_list_description_mode">Mode: </string>
 	<string name="fragment_chart_list_description_title">Title: </string>
 	<string name="fragment_chart_list_description_version">Version: </string>
+	<string name="fragment_chart_list_modify_title">Modify title: </string>
 	<string name="fragment_chart_list_no_loaded_chart">No loaded chart. Please click "+" button to load one.</string>
-	<string name="fragment_convertion_options_default_size">Default note size: </string>
+	<string name="fragment_chart_list_pack_converted_chart">Pack converted chart</string>
+	<string name="fragment_convertion_options_default_wide">Default note wide: </string>
 	<string name="fragment_convertion_options_default_speed">Default speed: </string>
 	<string name="fragment_convertion_options_default_y">Judge line default Y: </string>
 	<string name="fragment_convertion_options_drag_alpha">Drag alpha: </string>
@@ -46,14 +51,15 @@
 	<string name="fragment_convertion_options_invisible_line_message">The Y pos you input will make the judge line invisible. This may cause the chart becoming unplayable. Are you sure to keep this value?</string>
 	<string name="fragment_convertion_options_invisible_line_yes">Yes, I want to keep it</string>
 	<string name="fragment_convertion_options_invisible_line_no">No, make it to default pls</string>
+	<string name="fragment_convertion_options_is_cover">Judge line cover</string>
 	<string name="fragment_convertion_options_negative_speed_message">You inputed a negative speed. This may cause the chart becoming unplayable. Are you sure to keep this value?</string>
 	<string name="fragment_convertion_options_negative_speed_yes">Yes, I want to keep it</string>
 	<string name="fragment_convertion_options_negative_speed_no">No, make it positive pls</string>
+	<string name="fragment_convertion_options_note">Note: Modify default note wide to 0 will make the converter ignore the wide property of all notes in the original chart. osu!mania converter is still in developing.</string>
 	<string name="fragment_convertion_options_slide_process_mode">Slide process mode: </string>
 	<string name="fragment_convertion_options_slide_mode_moving_hold">Convert to moving hold</string>
 	<string name="fragment_convertion_options_slide_mode_straight_hold">Convert to straight hold</string>
 	<string name="fragment_convertion_options_slide_mode_tap_with_drags">Convert to Tap+Drags</string>
-	<string name="fragment_convertion_options_warning">Warning!</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="unknown">Unknown</string>
 </resources>

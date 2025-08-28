@@ -8,9 +8,9 @@ import org.json.JSONException;
 
 public class Fraction implements Comparable<Fraction> {
 	private final double EPSILON = 1e-6;
-	private final int num;
-	private final int up;
-	private final int down;
+	public final int num;
+	public final int up;
+	public final int down;
 	public Fraction() {
 		this(0, 0, 1);
 	}
