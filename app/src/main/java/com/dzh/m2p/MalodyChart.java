@@ -223,6 +223,6 @@ public class MalodyChart extends Chart {
 		if (video == null) return null;
 		JSONArray bpm = new JSONArray();
 		for (int i = 0; i < time.length(); i++) bpm.put(new JSONObject().put("bpm", time.getJSONObject(i).getDouble("bpm")).put("time", time.getJSONObject(i).getJSONArray("beat")));
-		return new JSONObject().put("bpm", bpm).put("videos", new JSONObject().put("path", video).put("dim", 0.5));
+		return new JSONObject().put("bpm", bpm).put("videos", new JSONArray().put(new JSONObject().put("path", video).put("dim", 0.5)));
 	}
 }

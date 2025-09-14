@@ -36,18 +36,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ConvertionOptionsFragment extends Fragment {
-	public boolean enableConst;
-	public double defaultSpeed;
-	public boolean isCover;
-	public double defaultY;
-	public boolean enableLuck;
-	public int defaultWide;
-	public int slideProcessMode;
-	public boolean enableDrag;
-	public boolean fakeDrag;
-	public int dragAlpha;
-	public Fraction dragInterval;
-	public boolean optimizeChart;
+	public boolean enableConst = false;
+	public double defaultSpeed = 10;
+	public boolean isCover = false;
+	public double defaultY = -278.15;
+	public boolean enableLuck = false;
+	public int defaultWide = 50;
+	public int slideProcessMode = 2;
+	public boolean enableDrag = true;
+	public boolean fakeDrag = true;
+	public int dragAlpha = 128;
+	public Fraction dragInterval = new Fraction(0, 1, 12);
+	public boolean optimizeChart = false;
 	private Activity activity;
 	private File properties;
 	@Override
@@ -155,6 +155,7 @@ public class ConvertionOptionsFragment extends Fragment {
 				}
 			}
 		);
+		slideProcessModeSpinner.setSelection(2);
 		Switch enableDragSwitch = root.findViewById(R.id.fragment_convertion_options_enable_drag);
 		enableDragSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
@@ -217,7 +218,7 @@ public class ConvertionOptionsFragment extends Fragment {
 			properties = new File(activity.getExternalFilesDir(null).getAbsolutePath() + File.separator + "properties.json");
 			if (properties.createNewFile()) {
 				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(properties), "UTF-8"));
-				bw.write(new JSONObject().put("const", false).put("speed", 10d).put("cover", false).put("y", -278.15).put("luck", false).put("wide", 50).put("slide", 0).put("drag", false).put("fake", false).put("alpha", 255).put("interval", new JSONArray().put(0).put(1).put(12)).put("optimize", false).toString());
+				bw.write(new JSONObject().put("const", false).put("speed", 10d).put("cover", false).put("y", -278.15).put("luck", false).put("wide", 50).put("slide", 2).put("drag", true).put("fake", true).put("alpha", 128).put("interval", new JSONArray().put(0).put(1).put(12)).put("optimize", false).toString());
 				bw.close();
 			}
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(properties), "UTF-8"));
@@ -244,6 +245,8 @@ public class ConvertionOptionsFragment extends Fragment {
 		return root;
 	}
 	public void saveProperties() throws IOException, JSONException {
+		properties = new File(activity.getExternalFilesDir(null).getAbsolutePath() + File.separator + "properties.json");
+		properties.createNewFile();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(properties), "UTF-8"));
 		bw.write(new JSONObject().put("const", enableConst).put("speed", defaultSpeed).put("cover", isCover).put("y", defaultY).put("luck", enableLuck).put("wide", defaultWide).put("slide", slideProcessMode).put("drag", enableDrag).put("fake", fakeDrag).put("alpha", dragAlpha).put("interval", dragInterval.toJSONArray()).put("optimize", optimizeChart).toString());
 		bw.close();
