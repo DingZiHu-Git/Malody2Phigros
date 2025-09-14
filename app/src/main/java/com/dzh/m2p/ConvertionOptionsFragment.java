@@ -47,7 +47,7 @@ public class ConvertionOptionsFragment extends Fragment {
 	public boolean fakeDrag;
 	public int dragAlpha;
 	public Fraction dragInterval;
-	public boolean optimizeSlide;
+	public boolean optimizeChart;
 	private Activity activity;
 	private File properties;
 	@Override
@@ -215,7 +215,7 @@ public class ConvertionOptionsFragment extends Fragment {
 		);
 		try {
 			properties = new File(activity.getExternalFilesDir(null).getAbsolutePath() + File.separator + "properties.json");
-			if (!properties.exists()) {
+			if (properties.createNewFile()) {
 				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(properties), "UTF-8"));
 				bw.write(new JSONObject().put("const", false).put("speed", 10d).put("cover", false).put("y", -278.15).put("luck", false).put("wide", 50).put("slide", 0).put("drag", false).put("fake", false).put("alpha", 255).put("interval", new JSONArray().put(0).put(1).put(12)).put("optimize", false).toString());
 				bw.close();
@@ -237,7 +237,7 @@ public class ConvertionOptionsFragment extends Fragment {
 			dragIntervalNum.setText(String.valueOf(dragInterval.num));
 			dragIntervalUp.setText(String.valueOf(dragInterval.up));
 			dragIntervalDown.setText(String.valueOf(dragInterval.down));
-			optimizeSlide = prop.getBoolean("optimize");
+			optimizeChart = prop.getBoolean("optimize");
 		} catch (Exception e) {
 			catcher(e);
 		}
@@ -245,31 +245,23 @@ public class ConvertionOptionsFragment extends Fragment {
 	}
 	public void saveProperties() throws IOException, JSONException {
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(properties), "UTF-8"));
-		bw.write(new JSONObject().put("const", enableConst).put("speed", defaultSpeed).put("cover", isCover).put("y", defaultY).put("luck", enableLuck).put("wide", defaultWide).put("slide", slideProcessMode).put("drag", enableDrag).put("fake", fakeDrag).put("alpha", dragAlpha).put("interval", dragInterval.toJSONArray()).put("optimize", optimizeSlide).toString());
+		bw.write(new JSONObject().put("const", enableConst).put("speed", defaultSpeed).put("cover", isCover).put("y", defaultY).put("luck", enableLuck).put("wide", defaultWide).put("slide", slideProcessMode).put("drag", enableDrag).put("fake", fakeDrag).put("alpha", dragAlpha).put("interval", dragInterval.toJSONArray()).put("optimize", optimizeChart).toString());
 		bw.close();
 	}
 	private void catcher(Exception e) {
+		for (File f : activity.getCacheDir().listFiles()) f.delete();
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw, true));
 		activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					AlertDialog.Builder adb = new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
+					new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								((ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Malody2Phigros", sw.toString()));
-								activity.finish();
 							}
 						}
-					).setNegativeButton(R.string.crash_cancel, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								activity.finish();
-							}
-						}
-					).setCancelable(false);
-					if (BuildConfig.DEBUG) adb.setNeutralButton("DEBUG", null);
-					adb.show();
+					).setNegativeButton(R.string.crash_cancel, null).setCancelable(false).show();
 				}
 			}
 		);

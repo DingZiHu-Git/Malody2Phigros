@@ -19,6 +19,7 @@ public class OsuChart extends Chart {
 	private int circleSize;
 	private int modeInt;
 	private List<TimingPoint> time;
+	private List<TimingPoint> effect;
 	private List<HitObject> note;
 	public OsuChart(File file) throws IOException {
 		time = new ArrayList<>();
@@ -29,8 +30,11 @@ public class OsuChart extends Chart {
 		boolean hitObjects = false;
 		while ((line = br.readLine()) != null) {
 			if (line.isEmpty()) timingPoints = hitObjects = false;
-			else if (timingPoints) time.add(new TimingPoint(line));
-			else if (hitObjects) note.add(new HitObject(line));
+			else if (timingPoints) {
+				TimingPoint tp = new TimingPoint(line);
+				if (tp.isEffect) effect.add(tp);
+				else time.add(tp);
+			} else if (hitObjects) note.add(new HitObject(line));
 			else if (line.toLowerCase().startsWith("audiofilename")) sound = line.substring(line.indexOf(":") + 1).trim();
 			else if (line.toLowerCase().startsWith("mode")) modeInt = Integer.parseInt(line.substring(line.indexOf(":") + 1).trim());
 			else if (line.toLowerCase().startsWith("title")) title = (title == null ? line.substring(line.indexOf(":") + 1).trim() : title);
@@ -84,25 +88,23 @@ public class OsuChart extends Chart {
 		/*int id = Random.nextInt();
 		if (id < 0) id = -id;
 		JSONObject result = new JSONObject();
+		TimingPoint lastTimingPoint = null;
 		JSONArray bpmList = new JSONArray();
-		for (int i = 0; i < time.size(); i++) if (!time.get(i).isEffect) bpmList.put(new JSONObject().put("startTime", time.getJSONObject(i).getJSONArray("beat")).put("bpm", time.getJSONObject(i).getDouble("bpm")));
+		for (int i = 0; i < time.size(); i++) if (!time.get(i).isEffect) {
+			bpmList.put(new JSONObject().put("startTime", time.getJSONObject(i).getJSONArray("beat")).put("bpm", time.getJSONObject(i).getDouble("bpm")));
+		}
 		result.put("BPMList", bpmList).put("META", new JSONObject().put("RPEVersion", 140).put("background", background).put("charter", creator).put("composer", artist).put("id", String.valueOf(id)).put("level", version).put("name", title).put("offset", -offset).put("song", sound)).put("judgeLineGroup", new JSONArray().put("Default"));
 		JSONArray judgeLineList = new JSONArray();
 		JSONObject main = new JSONObject().put("Group", 0).put("Name", "main").put("Texture", "line.png").put("alphaControl", new JSONArray().put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 0d)).put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 9999999d))).put("bpmfactor", 1d);
 		JSONArray mainSpeedEvents = new JSONArray().put(new JSONObject().put("bezier", 0).put("bezierPoints", new JSONArray().put(0d).put(0d).put(0d).put(0d)).put("easingLeft", 0d).put("easingRight", 1d).put("easingType", 1).put("end", cof.defaultSpeed).put("endTime", new JSONArray().put(1).put(0).put(1)).put("linkgroup", 0).put("start", cof.defaultSpeed).put("startTime", new JSONArray().put(0).put(0).put(1)));
 		if (!cof.enableConst) {
 			Map<Fraction, Double> speeds = new HashMap<>();
-			double bpm = time.getJSONObject(0).getDouble("bpm");
-			for (int i = 1; i < time.length(); i++) {
-				JSONObject speed = time.getJSONObject(i);
-				speeds.put(new Fraction(speed.getJSONArray("beat")), speed.getDouble("bpm") / bpm);
-			}
-			for (int i = 0; i < effect.length(); i++) {
-				JSONObject lastSpeed = i == 0 ? null : effect.getJSONObject(i - 1);
-				JSONObject speed = effect.getJSONObject(i);
-				Fraction beat = new Fraction(speed.getJSONArray("beat"));
-				if (speed.has("scroll")) speeds.put(beat, speeds.containsKey(beat) ? speeds.get(beat) * speed.getDouble("scroll") : speed.getDouble("scroll"));
-				//else if (speed.has("jump")) System.out.println("Too hard, I'll finish it in future");
+			double bpm = time.get(0).beatLength;
+			lastTimingPoint = null;
+			for (int i = 1; i < time.size(); i++) {
+				TimingPoint lastSpeed = time.get(i - 1);
+				TimingPoint speed = time.get(i);
+				speeds.put(lastBeat.add(new Fraction(speed.time - lastSpeed.time)), speed.beatLength / (speed.isEffect ? -100d : bpm));
 			}
 			ArrayList<Map.Entry<Fraction, Double>> list = new ArrayList<Map.Entry<Fraction, Double>>(speeds.entrySet());
 			list.sort(new Comparator<Map.Entry<Fraction, Double>>() {
@@ -131,6 +133,10 @@ public class OsuChart extends Chart {
 		main.put("notes", notes).put("numOfNotes", notes.length()).put("posControl", new JSONArray().put(new JSONObject().put("easing", 1).put("pos", 1d).put("x", 0d)).put(new JSONObject().put("easing", 1).put("pos", 1d).put("x", 9999999d))).put("skewControl", new JSONArray().put(new JSONObject().put("easing", 1).put("skew", 0d).put("x", 0d)).put(new JSONObject().put("easing", 1).put("skew", 0d).put("x", 9999999d))).put("yControl", new JSONArray().put(new JSONObject().put("easing", 1).put("x", 0d).put("y", 1d)).put(new JSONObject().put("easing", 1).put("x", 9999999d).put("y", 1d))).put("zOrder", 0);
 		judgeLineList.put(main);
 		return result.put("judgeLineList", judgeLineList).put("multiLineString", "0").put("multiScale", 1d);*/
-		return new JSONObject();
+		return null;
+	}
+	@Override
+	public JSONObject getExtra() throws JSONException {
+		return null;
 	}
 }

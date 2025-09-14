@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -33,12 +32,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ChartListFragment extends Fragment {
+	public boolean loaded;
 	private Activity activity;
 	private List<Map<String, Object>> listData;
 	private SimpleAdapter listAdapter;
@@ -54,9 +53,14 @@ public class ChartListFragment extends Fragment {
 		list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					Map<String, Object> map = listData.get(position);
-					map.put("check", !((boolean) map.get("check")));
-					listAdapter.notifyDataSetChanged();
+					try {
+						Map<String, Object> map = listData.get(position);
+						File f = (File) map.get("file");
+						f.renameTo(new File(f.getParent() + File.separator + ((boolean) map.get("check") ? f.getName() + ".disabled" : f.getName().substring(0, f.getName().lastIndexOf(".")))));
+						refresh();
+					} catch (Exception e) {
+						catcher(e);
+					}
 				}
 			}
 		);
@@ -126,17 +130,12 @@ public class ChartListFragment extends Fragment {
 				}
 			}
 		);
-		new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						refresh();
-					} catch (Exception e) {
-						catcher(e);
-					}
-				}
-			}
-		, "init").start();
+		try {
+			refresh();
+		} catch (Exception e) {
+			catcher(e);
+		}
+		loaded = true;
 		return root;
 	}
 	public void convert(ExecutorService es, final ConvertionOptionsFragment cof, final Uri uri) {
@@ -147,14 +146,24 @@ public class ChartListFragment extends Fragment {
 						try {
 							File temp = new File(activity.getCacheDir() + File.separator + map.get("title"));
 							temp.mkdirs();
+							Chart chart = (Chart) map.get("chart");
 							BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp.getAbsolutePath() + File.separator + map.get("title") + ".json"), "UTF-8"));
-							bw.write(((Chart) map.get("chart")).convert(cof).toString());
+							bw.write(chart.convert(cof).toString());
 							bw.close();
 							if ((boolean) map.get("pack")) {
 								File f = (File) map.get("file");
-								if (map.get("background") == null) FileUtil.copy(activity.getResources().openRawResource(R.raw.icon), temp.getAbsolutePath() + File.separator + "icon.png", new byte[128671]);
-								else FileUtil.copy(f.getAbsolutePath() + File.separator + map.get("background"), temp.getAbsolutePath() + File.separator + map.get("background"), new byte[1024 * 1024 * 4]);
-								FileUtil.copy(f.getAbsolutePath() + File.separator + map.get("sound"), temp.getAbsolutePath() + File.separator + map.get("sound"), new byte[1024 * 1024 * 4]);
+								if (chart.background == null) FileUtil.copy(activity.getResources().openRawResource(R.raw.icon), temp.getAbsolutePath() + File.separator + "icon.png", new byte[128671]);
+								else FileUtil.copy(f.getAbsolutePath() + File.separator + chart.background, temp.getAbsolutePath() + File.separator + chart.background, new byte[1024 * 1024 * 4]);
+								if (chart.video != null) {
+									FileUtil.copy(f.getAbsolutePath() + File.separator + chart.video, temp.getAbsolutePath() + File.separator + chart.video, new byte[1024 * 1024 * 4]);
+									bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp.getAbsolutePath() + File.separator + "extra.json"), "UTF-8"));
+									bw.write(chart.getExtra().toString());
+									bw.close();
+								}
+								FileUtil.copy(f.getAbsolutePath() + File.separator + chart.sound, temp.getAbsolutePath() + File.separator + chart.sound, new byte[1024 * 1024 * 4]);
+								bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp.getAbsolutePath() + File.separator + "info.txt"), "UTF-8"));
+								bw.write("#\nName: " + chart.title + "\nPath: " + chart.title + "\nSong: " + chart.sound + "\nPicture: " + chart.background + "\nChart: " + map.get("title") + ".json\nLevel: " + chart.version + "\nComposer: " + chart.artist + "\nCharter: " + chart.creator + "\n");
+								bw.close();
 								Zip.zip(temp.getAbsolutePath(), activity.getContentResolver().openOutputStream(DocumentFile.fromTreeUri(activity, uri).createFile("application/octet-stream", map.get("title") + ".pez").getUri()), "UTF-8", false);
 							} else FileUtil.copy(temp.getAbsolutePath() + File.separator + map.get("title") + ".json", activity.getContentResolver().openOutputStream(DocumentFile.fromTreeUri(activity, uri).createFile("application/octet-stream", map.get("title") + ".json").getUri()), new byte[1024 * 1024 * 4]);
 							for (File f : temp.listFiles()) f.delete();
@@ -174,9 +183,10 @@ public class ChartListFragment extends Fragment {
 			boolean add = false;
 			Map<String, Object> map = new HashMap<>();
 			String name = f.getName();
-			if (!f.getName().contains(".")) return;
-			map.put("title", name.substring(0, name.lastIndexOf(".")));
-			map.put("extension", name.substring(name.lastIndexOf(".")));
+			if (!name.contains(".")) return;
+			String processedName = name.endsWith(".disabled") ? name.substring(0, name.lastIndexOf(".")) : name;
+			map.put("title", processedName.substring(0, processedName.lastIndexOf(".")));
+			map.put("extension", processedName.substring(processedName.lastIndexOf(".")));
 			boolean pack = false;
 			if (f.isDirectory()) {
 				map.put("packable", true);
@@ -200,7 +210,7 @@ public class ChartListFragment extends Fragment {
 				}
 				map.put("packable", false);
 			}
-			map.put("check", false);
+			map.put("check", !name.endsWith(".disabled"));
 			map.put("pack", pack);
 			map.put("file", f);
 			if (add) listData.add(map);
@@ -231,27 +241,19 @@ public class ChartListFragment extends Fragment {
 		map.put("chart", oc);
 	}
 	private void catcher(Exception e) {
+		for (File f : activity.getCacheDir().listFiles()) f.delete();
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw, true));
 		activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					AlertDialog.Builder adb = new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
+					new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								((ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Malody2Phigros", sw.toString()));
-								activity.finish();
 							}
 						}
-					).setNegativeButton(R.string.crash_cancel, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								activity.finish();
-							}
-						}
-					).setCancelable(false);
-					if (BuildConfig.DEBUG) adb.setNeutralButton("DEBUG", null);
-					adb.show();
+					).setNegativeButton(R.string.crash_cancel, null).setCancelable(false).show();
 				}
 			}
 		);

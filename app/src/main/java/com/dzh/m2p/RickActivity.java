@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 
 public class RickActivity extends AppCompatActivity {
 	private VideoView vv;
+	private int playTimes;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,6 +25,7 @@ public class RickActivity extends AppCompatActivity {
 				@Override
 				public void onCompletion(MediaPlayer mp) {
 					mp.start();
+					if (++playTimes == 2) startActivity(new Intent(RickActivity.this, MinesweeperActivity.class));
 				}
 			}
 		);

@@ -23,8 +23,8 @@ public class MalodyChart extends Chart {
 	public MalodyChart(File file) throws IOException, JSONException {
 		String json = "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-		String line;
-		while ((line = br.readLine()) != null) json += line;
+		json = br.readLine();
+		br.close();
 		JSONObject main = new JSONObject(json);
 		JSONObject meta = main.getJSONObject("meta");
 		JSONObject song = meta.getJSONObject("song");
@@ -32,6 +32,7 @@ public class MalodyChart extends Chart {
 		if (song.has("artistorg")) temp = song.getString("artistorg");
 		artist = temp != null && !temp.isEmpty() ? temp : song.getString("artist");
 		background = meta.has("background") && !meta.getString("background").isEmpty() ? meta.getString("background") : null;
+		video = meta.has("video") && !meta.getString("video").isEmpty() ? meta.getString("video") : null;
 		creator = meta.getString("creator");
 		modeInt = meta.getInt("mode");
 		switch (modeInt) {
@@ -70,20 +71,28 @@ public class MalodyChart extends Chart {
 		result.put("BPMList", bpmList).put("META", new JSONObject().put("RPEVersion", 140).put("background", background).put("charter", creator).put("composer", artist).put("id", String.valueOf(id)).put("level", version).put("name", title).put("offset", -offset).put("song", sound)).put("judgeLineGroup", new JSONArray().put("Default"));
 		JSONArray judgeLineList = new JSONArray();
 		JSONObject main = new JSONObject().put("Group", 0).put("Name", "main").put("Texture", "line.png").put("alphaControl", new JSONArray().put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 0d)).put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 9999999d))).put("bpmfactor", 1d);
-		JSONArray mainSpeedEvents = new JSONArray().put(new JSONObject().put("bezier", 0).put("bezierPoints", new JSONArray().put(0d).put(0d).put(0d).put(0d)).put("easingLeft", 0d).put("easingRight", 1d).put("easingType", 1).put("end", cof.defaultSpeed).put("endTime", new JSONArray().put(1).put(0).put(1)).put("linkgroup", 0).put("start", cof.defaultSpeed).put("startTime", new JSONArray().put(0).put(0).put(1)));
+		JSONArray mainSpeedEvents = new JSONArray();
 		if (!cof.enableConst) {
+			Fraction eoc = null;
+			for (int i = note.length() - 1; i > 0; i--) if (!note.getJSONObject(i).has("sound")) eoc = new Fraction(note.getJSONObject(i).getJSONArray("beat"));
 			Map<Fraction, Double> speeds = new HashMap<>();
-			double bpm = time.getJSONObject(0).getDouble("bpm");
-			for (int i = 1; i < time.length(); i++) {
+			JSONObject bpm = new JSONObject().put("beat", new JSONArray().put(Integer.MIN_VALUE).put(0).put(1));
+			ArrayList<Fraction> dt = new ArrayList<>();
+			for (int i = 0; i < time.length(); i++) dt.add((i == time.length() - 1 ? eoc : new Fraction(time.getJSONObject(i + 1).getJSONArray("beat"))).subtract(new Fraction(time.getJSONObject(i).getJSONArray("beat"))));
+			for (int i = 0; i < dt.size(); i++) if (dt.get(i).compareTo(new Fraction(bpm.getJSONArray("beat"))) == 1) bpm = time.getJSONObject(i);
+			for (int i = 0; i < time.length(); i++) {
 				JSONObject speed = time.getJSONObject(i);
-				speeds.put(new Fraction(speed.getJSONArray("beat")), speed.getDouble("bpm") / bpm);
+				speeds.put(new Fraction(speed.getJSONArray("beat")), speed.getDouble("bpm") / bpm.getDouble("bpm"));
 			}
+			double lastSpeed = 0;
 			for (int i = 0; i < effect.length(); i++) {
-				JSONObject lastSpeed = i == 0 ? null : effect.getJSONObject(i - 1);
 				JSONObject speed = effect.getJSONObject(i);
 				Fraction beat = new Fraction(speed.getJSONArray("beat"));
-				if (speed.has("scroll")) speeds.put(beat, speeds.containsKey(beat) ? speeds.get(beat) * speed.getDouble("scroll") : speed.getDouble("scroll"));
-				//else if (speed.has("jump")) System.out.println("Too hard, I'll finish it in future");
+				if (speed.has("scroll") || speed.has("sv")) speeds.put(beat, lastSpeed = speeds.containsKey(beat) ? speeds.get(beat) * (speed.has("sv") ? speed.getDouble("sv") : speed.getDouble("scroll")) : (lastSpeed = speed.has("sv") ? speed.getDouble("sv") : speed.getDouble("scroll")));
+				else if (speed.has("jump")) {
+					speeds.put(beat, speeds.containsKey(beat) ? speeds.get(beat) * speed.getDouble("jump") * 1000 : speed.getDouble("jump") * 1000);
+					speeds.put(beat.add(new Fraction(0, 1, 256)), lastSpeed);
+				}
 			}
 			ArrayList<Map.Entry<Fraction, Double>> list = new ArrayList<Map.Entry<Fraction, Double>>(speeds.entrySet());
 			list.sort(new Comparator<Map.Entry<Fraction, Double>>() {
@@ -208,5 +217,12 @@ public class MalodyChart extends Chart {
 		main.put("notes", notes).put("numOfNotes", notes.length()).put("posControl", new JSONArray().put(new JSONObject().put("easing", 1).put("pos", 1d).put("x", 0d)).put(new JSONObject().put("easing", 1).put("pos", 1d).put("x", 9999999d))).put("skewControl", new JSONArray().put(new JSONObject().put("easing", 1).put("skew", 0d).put("x", 0d)).put(new JSONObject().put("easing", 1).put("skew", 0d).put("x", 9999999d))).put("yControl", new JSONArray().put(new JSONObject().put("easing", 1).put("x", 0d).put("y", 1d)).put(new JSONObject().put("easing", 1).put("x", 9999999d).put("y", 1d))).put("zOrder", 0);
 		judgeLineList.put(main);
 		return result.put("judgeLineList", judgeLineList).put("multiLineString", "0").put("multiScale", 1d);
+	}
+	@Override
+	public JSONObject getExtra() throws JSONException {
+		if (video == null) return null;
+		JSONArray bpm = new JSONArray();
+		for (int i = 0; i < time.length(); i++) bpm.put(new JSONObject().put("bpm", time.getJSONObject(i).getDouble("bpm")).put("time", time.getJSONObject(i).getJSONArray("beat")));
+		return new JSONObject().put("bpm", bpm).put("videos", new JSONObject().put("path", video).put("dim", 0.5));
 	}
 }

@@ -13,6 +13,7 @@
 	<string name="activity_main_start_convert">Start convert</string>
 	<string name="activity_main_tab_chart_list">Chart List</string>
 	<string name="activity_main_tab_convertion_options">Convertion Options</string>
+	<string name="activity_main_tab_faq">FAQ</string>
 	<string name="activity_minesweeper_mines_left">Mines left: </string>
 	<string name="activity_minesweeper_settings">Minesweeper settings</string>
 	<string name="activity_minesweeper_settings_cols">Cols: </string>
@@ -22,12 +23,16 @@
 	<string name="activity_minesweeper_time_used">Time used: </string>
 	<string name="activity_minesweeper_title">Minesweeper</string>
 	<string name="activity_rick_title">Get Rickrolled lol</string>
+	<string name="activity_settings_saf">SAF (Storage Access Framework)</string>
+	<string name="activity_settings_initial_folder">Initial folder: </string>
+	<string name="activity_settings_select_initial_folder">Select initial folder</string>
+	<string name="activity_settings_use_last_folder">Use last folder</string>
 	<string name="app_name">Malody2Phigros</string>
 	<string name="april_fools_dialog_title">Malody2Phigros has stopped being supported</string>
 	<string name="april_fools_dialog_message">New production has been released! Isn\'t it amazing? Press the LINK below to get one</string>
 	<string name="april_fools_dialog_ok">LINK</string>
-	<string name="crash_cancel">Quit directly</string>
-	<string name="crash_ok">Copy the error message then quit</string>
+	<string name="crash_cancel">Ignore</string>
+	<string name="crash_ok">Copy the error message</string>
 	<string name="crash_title">PhigrOS crashed</string>
 	<string name="fragment_chart_list_delete_chart">Delete chart</string>
 	<string name="fragment_chart_list_description_artist">Artist: </string>
@@ -60,6 +65,8 @@
 	<string name="fragment_convertion_options_slide_mode_moving_hold">Convert to moving hold</string>
 	<string name="fragment_convertion_options_slide_mode_straight_hold">Convert to straight hold</string>
 	<string name="fragment_convertion_options_slide_mode_tap_with_drags">Convert to Tap+Drags</string>
+	<string name="fragment_faq_chart_packing_title">Why my converted chart is not packed? / Why my converted chart is .json format?</string>
+	<string name="fragment_faq_chart_packing_content">If the format of the chart you imported is .mc or .osu, you CANNOT get the packed chart; If not, you will need to long click the imported chart and enable the "Pack converted chart" option by yourself to get the packed chart.</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="unknown">Unknown</string>
 </resources>

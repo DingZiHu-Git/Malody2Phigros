@@ -5,11 +5,13 @@ import org.json.JSONObject;
 public abstract class Chart {
 	public String artist;
 	public String background;
+	public String video;
 	public String creator;
 	public String mode;
 	public int offset;
 	public String sound;
 	public String title;
 	public String version;
-	public abstract JSONObject convert(ConvertionOptionsFragment cof) throws Exception;
+	public abstract JSONObject convert(ConvertionOptionsFragment cof) throws Exception
+	public abstract JSONObject getExtra() throws Exception;
 }

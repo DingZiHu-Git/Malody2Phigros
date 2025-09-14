@@ -14,6 +14,7 @@
 	<string name="activity_main_start_convert">开始转换</string>
 	<string name="activity_main_tab_chart_list">谱面列表</string>
 	<string name="activity_main_tab_convertion_options">转谱选项</string>
+	<string name="activity_main_tab_faq">FAQ</string>
 	<string name="activity_minesweeper_mines_left">剩余雷数：</string>
 	<string name="activity_minesweeper_settings">扫雷设置</string>
 	<string name="activity_minesweeper_settings_cols">列数：</string>
@@ -23,11 +24,15 @@
 	<string name="activity_minesweeper_time_used">已用时间：</string>
 	<string name="activity_minesweeper_title">扫雷</string>
 	<string name="activity_rick_title">你被骗了lol</string>
+	<string name="activity_settings_saf">SAF（存储访问框架）</string>
+	<string name="activity_settings_initial_folder">起始文件夹：</string>
+	<string name="activity_settings_select_initial_folder">选择起始文件夹</string>
+	<string name="activity_settings_use_last_folder">使用上一个文件夹</string>
 	<string name="april_fools_dialog_title">Malody2Phigros已停止支持</string>
 	<string name="april_fools_dialog_message">新作已经发布！这不神奇吗？点击下方链接获取一个</string>
 	<string name="april_fools_dialog_ok">链接</string>
-	<string name="crash_cancel">直接退出</string>
-	<string name="crash_ok">复制报错后退出</string>
+	<string name="crash_cancel">忽略</string>
+	<string name="crash_ok">复制报错信息</string>
 	<string name="crash_title">PhigrOS已崩溃</string>
 	<string name="fragment_chart_list_delete_chart">删除谱面</string>
 	<string name="fragment_chart_list_description_artist">艺术家：</string>
@@ -60,6 +65,8 @@
 	<string name="fragment_convertion_options_slide_mode_moving_hold">转换为移动的Hold</string>
 	<string name="fragment_convertion_options_slide_mode_straight_hold">转换为直Hold</string>
 	<string name="fragment_convertion_options_slide_mode_tap_with_drags">转换为Tap+一堆Drag</string>
+	<string name="fragment_faq_chart_packing_title">为什么我转换后的谱面没有被打包？/为什么我转换后的谱面是.json格式？</string>
+	<string name="fragment_faq_chart_packing_content">如果你导入的谱面格式是.mc或.osu，你不能得到被打包的谱面；如果不是，你需要长按导入的谱面并自己启用“打包已转换谱面”选项来得到被打包的谱面。</string>
 	<string name="please_wait">请稍候……</string>
 	<string name="unknown">未知</string>
 </resources>
