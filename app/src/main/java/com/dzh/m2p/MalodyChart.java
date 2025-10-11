@@ -72,9 +72,10 @@ public class MalodyChart extends Chart {
 		JSONArray judgeLineList = new JSONArray();
 		JSONObject main = new JSONObject().put("Group", 0).put("Name", "main").put("Texture", "line.png").put("alphaControl", new JSONArray().put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 0d)).put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 9999999d))).put("bpmfactor", 1d);
 		JSONArray mainSpeedEvents = new JSONArray();
-		if (!cof.enableConst) {
+		if (cof.enableConst) mainSpeedEvents.put(new JSONObject().put("end", cof.defaultSpeed).put("endTime", new JSONArray().put(0).put(0).put(1)).put("linkgroup", 0).put("start", cof.defaultSpeed).put("startTime", new JSONArray().put(0).put(0).put(1)));
+		else {
 			Fraction eoc = null;
-			for (int i = note.length() - 1; i > 0; i--) if (!note.getJSONObject(i).has("sound")) eoc = new Fraction(note.getJSONObject(i).getJSONArray("beat"));
+			for (int i = note.length() - 1; i > -1; i--) if (!note.getJSONObject(i).has("sound")) eoc = new Fraction(note.getJSONObject(i).getJSONArray("beat"));
 			Map<Fraction, Double> speeds = new HashMap<>();
 			JSONObject bpm = new JSONObject().put("beat", new JSONArray().put(Integer.MIN_VALUE).put(0).put(1));
 			ArrayList<Fraction> dt = new ArrayList<>();
@@ -84,15 +85,10 @@ public class MalodyChart extends Chart {
 				JSONObject speed = time.getJSONObject(i);
 				speeds.put(new Fraction(speed.getJSONArray("beat")), speed.getDouble("bpm") / bpm.getDouble("bpm"));
 			}
-			double lastSpeed = 0;
 			for (int i = 0; i < effect.length(); i++) {
 				JSONObject speed = effect.getJSONObject(i);
 				Fraction beat = new Fraction(speed.getJSONArray("beat"));
-				if (speed.has("scroll") || speed.has("sv")) speeds.put(beat, lastSpeed = speeds.containsKey(beat) ? speeds.get(beat) * (speed.has("sv") ? speed.getDouble("sv") : speed.getDouble("scroll")) : (lastSpeed = speed.has("sv") ? speed.getDouble("sv") : speed.getDouble("scroll")));
-				else if (speed.has("jump")) {
-					speeds.put(beat, speeds.containsKey(beat) ? speeds.get(beat) * speed.getDouble("jump") * 1000 : speed.getDouble("jump") * 1000);
-					speeds.put(beat.add(new Fraction(0, 1, 256)), lastSpeed);
-				}
+				if (speed.has("scroll") || speed.has("sv")) speeds.put(beat, speeds.containsKey(beat) ? speeds.get(beat) * (speed.has("sv") ? speed.getDouble("sv") : speed.getDouble("scroll")) : (speed.has("sv") ? speed.getDouble("sv") : speed.getDouble("scroll")));
 			}
 			ArrayList<Map.Entry<Fraction, Double>> list = new ArrayList<Map.Entry<Fraction, Double>>(speeds.entrySet());
 			list.sort(new Comparator<Map.Entry<Fraction, Double>>() {

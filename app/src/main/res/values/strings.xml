@@ -6,6 +6,12 @@
 	<string name="activity_main_load_chart_failed_unsupported_file_type">Unsupported file type. Please modify the file extension or change the file then retry.</string>
 	<string name="activity_main_permissions_request_title">Permissions request</string>
 	<string name="activity_main_permissions_request_message">The application is a chart converter, which needs read and write permissions to access the external storage of the device. This won\'t be used for other purposes. If you don\'t allow to grant the permissions, please click "CANCEL" to exit the application.</string>
+	<string name="activity_main_plugins">Plugins (EXPERIMENTAL)</string>
+	<string name="activity_main_plugin_manager">Plugin manager</string>
+	<string name="activity_main_plugin_manager_empty">No avaliable plugins. Please click "IMPORT PLUGIN" to import a plugin.</string>
+	<string name="activity_main_plugin_manager_import_plugin">IMPORT PLUGIN</string>
+	<string name="activity_main_plugin_manager_message">Click on an item to delete the plugin:</string>
+	<string name="activity_main_plugin_modified_successfully">Plugin modified successfully. You need to restart the application to apply changes.</string>
 	<string name="activity_main_save_properties">Save properties</string>
 	<string name="activity_main_settings">Settings</string>
 	<string name="activity_main_select_folder">Select folder...</string>
@@ -60,13 +66,15 @@
 	<string name="fragment_convertion_options_negative_speed_message">You inputed a negative speed. This may cause the chart becoming unplayable. Are you sure to keep this value?</string>
 	<string name="fragment_convertion_options_negative_speed_yes">Yes, I want to keep it</string>
 	<string name="fragment_convertion_options_negative_speed_no">No, make it positive pls</string>
-	<string name="fragment_convertion_options_note">Note: Modify default note wide to 0 will make the converter ignore the wide property of all notes in the original chart. osu!mania converter is still in developing.</string>
+	<string name="fragment_convertion_options_note">Note: Modify default note wide to 0 will make the converter ignore the wide property of all notes in the original chart. Jump effect convertion is not supported for now. Please use scroll or sv to replace them. osu!mania converter is still in developing.</string>
 	<string name="fragment_convertion_options_slide_process_mode">Slide process mode: </string>
 	<string name="fragment_convertion_options_slide_mode_moving_hold">Convert to moving hold</string>
 	<string name="fragment_convertion_options_slide_mode_straight_hold">Convert to straight hold</string>
 	<string name="fragment_convertion_options_slide_mode_tap_with_drags">Convert to Tap+Drags</string>
 	<string name="fragment_faq_chart_packing_title">Why my converted chart is not packed? / Why my converted chart is .json format?</string>
 	<string name="fragment_faq_chart_packing_content">If the format of the chart you imported is .mc or .osu, you CANNOT get the packed chart; If not, you will need to long click the imported chart and enable the "Pack converted chart" option by yourself to get the packed chart.</string>
+	<string name="fragment_faq_how_to_make_a_plugin_title">How to make a plugin?</string>
+	<string name="fragment_faq_how_to_make_a_plugin_content">The plugin system uses WebView to load plugins. The system only supports JavaScript to code a plugin for now. If you need to custom a user interface, please use document.body.innerHTML to modify the HTML content.</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="unknown">Unknown</string>
 </resources>

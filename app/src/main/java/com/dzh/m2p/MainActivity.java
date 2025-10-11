@@ -1,5 +1,6 @@
 package com.dzh.m2p;
 
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -14,6 +15,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
+import android.webkit.JsResult;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,28 +46,22 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.json.JSONObject;
-import java.io.IOException;
-import org.json.JSONException;
 
 public class MainActivity extends AppCompatActivity {
 	private WaitDialog wait;
 	private ChartListFragment clf;
 	private ConvertionOptionsFragment cof;
-	private Uri initialUri;
 	private int count;
-	private void init() throws IOException, JSONException {
+	private File[] plugins;
+	private ValueCallback<Uri[]> jsFilePath;
+	private void init() {
 		File settings = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator + "settings.json");
-		if (settings.createNewFile()) {
-			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(settings), "UTF-8"));
-			bw.write(new JSONObject().put("initialUri", Uri.parse("content://com.android.externalstorage.documents/root/primary")).toString());
-			bw.close();
-		}
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(settings), "UTF-8"));
-		initialUri = Uri.parse(new JSONObject(br.readLine()).getString("initialUri"));
-		br.close();
+		if (settings.exists()) settings.delete();
+		plugins = getExternalFilesDir("plugins").listFiles();
 		wait = new WaitDialog(this);
 		if (new SimpleDateFormat("Md").format(System.currentTimeMillis()).equals("41")) new AlertDialog.Builder(this).setTitle(R.string.april_fools_dialog_title).setMessage(R.string.april_fools_dialog_message).setPositiveButton(R.string.april_fools_dialog_ok, new DialogInterface.OnClickListener() {
 				@Override
@@ -205,6 +207,15 @@ public class MainActivity extends AppCompatActivity {
 					);
 				}
 				for (File f : getCacheDir().listFiles()) f.delete();
+			} else if (name.toLowerCase().endsWith(".js")) {
+				FileUtil.copy(getContentResolver().openInputStream(data), getExternalFilesDir("plugins").getAbsolutePath() + File.separator + name, new byte[1024 * 1024 * 4]);
+				runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							new AlertDialog.Builder(MainActivity.this).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.activity_main_plugin_modified_successfully).setPositiveButton(android.R.string.ok, null).setCancelable(false).show();
+						}
+					}
+				);
 			} else runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -220,101 +231,189 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK) {
+		try {
 			switch (requestCode) {
 				case 1:
-					new Thread(new Runnable() {
-							@Override
-							public void run() {
-								load(data.getData());
-								wait.cancel();
+				case 3:
+					if (data != null) {
+						new Thread(new Runnable() {
+								@Override
+								public void run() {
+									load(data.getData());
+									wait.cancel();
+								}
 							}
-						}
-					, "Load").start();
-					wait.show();
-					break;
-				case 2:
-					try {
-						getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-					} catch (Exception e) {
-						catcher(e);
+							, "Load").start();
+						wait.show();
 					}
 					break;
-				case 3:
-					initialUri = data.getData();
+				case 2:
+					if (data != null) getContentResolver().takePersistableUriPermission(data.getData(), Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+					break;
+				case 4:
+					if (jsFilePath == null) return;
+					if (data == null) jsFilePath.onReceiveValue(null);
+					else {
+						Uri[] result = null;
+						String dataString = data.getDataString();
+						ClipData clipData = data.getClipData();
+						if (clipData != null) {
+							result = new Uri[clipData.getItemCount()];
+							for (int i = 0; i < result.length; i++) result[i] = clipData.getItemAt(i).getUri();
+						} else if (dataString != null) result = new Uri[]{ Uri.parse(dataString) };
+						jsFilePath.onReceiveValue(result);
+					}
+					jsFilePath = null;
 					break;
 			}
+		} catch (Exception e) {
+			catcher(e);
 		}
 	}
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.activity_main_load_chart:
-				Intent intent = new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
-				if (initialUri != null) intent.putExtra("android.provider.extra.INITIAL_URI", initialUri);
-				startActivityForResult(intent, 1);
-				return true;
-			case R.id.activity_main_clear_loaded_chart:
-				new Thread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								for (File f : getFilesDir().listFiles()) {
-									if (f.isDirectory()) for (File c : f.listFiles()) c.delete();
-									f.delete();
+		try {
+			int id = item.getItemId();
+			switch (id) {
+				case R.id.activity_main_load_chart:
+					startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"), 1);
+					return true;
+				case R.id.activity_main_clear_loaded_chart:
+					new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									for (File f : getFilesDir().listFiles()) {
+										if (f.isDirectory()) for (File c : f.listFiles()) c.delete();
+										f.delete();
+									}
+									clf.refresh();
+									wait.cancel();
+								} catch (Exception e) {
+									catcher(e);
 								}
-								clf.refresh();
-								wait.cancel();
-							} catch (Exception e) {
-								catcher(e);
 							}
 						}
-					}
-				, "ClearLoadedChart").start();
-				wait.show();
-				return true;
-			case R.id.activity_main_start_convert:
-				final List<UriPermission> permissions = getContentResolver().getPersistedUriPermissions();
-				final String[] accessibleDirs = new String[permissions.size() + 1];
-				for (int i = 0; i < permissions.size(); i++) accessibleDirs[i] = DocumentFile.fromTreeUri(MainActivity.this, permissions.get(i).getUri()).getName();
-				accessibleDirs[accessibleDirs.length - 1] = getString(R.string.activity_main_select_folder);
-				new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_select_save_location).setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, accessibleDirs), new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, final int which) {
-							if (which == accessibleDirs.length - 1) startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 2);
-							else {
-								final ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-								clf.convert(es, cof, permissions.get(which).getUri());
-								new Thread(new Runnable() {
-										@Override
-										public void run() {
-											try {
-												es.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-												wait.cancel();
-											} catch (Exception e) {
-												catcher(e);
+						, "ClearLoadedChart").start();
+					wait.show();
+					return true;
+				case R.id.activity_main_start_convert:
+					final List<UriPermission> permissions = getContentResolver().getPersistedUriPermissions();
+					for (int i = permissions.size() - 1; i > -1; i--) if (!DocumentFile.fromTreeUri(MainActivity.this, permissions.get(i).getUri()).exists()) permissions.remove(i);
+					final String[] accessibleDirs = new String[permissions.size() + 1];
+					for (int i = 0; i < permissions.size(); i++) accessibleDirs[i] = DocumentFile.fromTreeUri(MainActivity.this, permissions.get(i).getUri()).getName();
+					accessibleDirs[accessibleDirs.length - 1] = getString(R.string.activity_main_select_folder);
+					new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_select_save_location).setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, accessibleDirs), new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, final int which) {
+								if (which == accessibleDirs.length - 1) startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 2);
+								else {
+									final ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+									clf.convert(es, cof, permissions.get(which).getUri());
+									new Thread(new Runnable() {
+											@Override
+											public void run() {
+												try {
+													es.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+													wait.cancel();
+												} catch (Exception e) {
+													catcher(e);
+												}
 											}
 										}
-									}
-								, "Convert").start();
-								wait.show();
+										, "Convert").start();
+									wait.show();
+								}
 							}
 						}
-					}
-				).show();
-				return true;
-			case R.id.activity_main_save_properties:
-				try {
+					).show();
+					return true;
+				case R.id.activity_main_save_properties:
 					cof.saveProperties();
-				} catch (Exception e) {
-					catcher(e);
-				}
-				return true;
-			case R.id.activity_main_settings:
-				startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), 3);
-				return true;
+					return true;
+				case R.id.activity_main_plugin_manager:
+					final AtomicBoolean avaliable = new AtomicBoolean(false);
+					String[] names = new String[Math.max(1, plugins.length)];
+					names[0] = getString(R.string.activity_main_plugin_manager_empty);
+					for (int i = 0; i < plugins.length; i++) {
+						names[i] = plugins[i].getName().substring(0, plugins[i].getName().lastIndexOf("."));
+						avaliable.set(true);
+					}
+					new AlertDialog.Builder(MainActivity.this).setTitle(R.string.activity_main_plugin_manager_message).setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, names), new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								if (avaliable.get()) {
+									plugins[which].delete();
+									new AlertDialog.Builder(MainActivity.this).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.activity_main_plugin_modified_successfully).setPositiveButton(android.R.string.ok, null).setCancelable(false).show();
+								}
+							}
+						}
+					).setPositiveButton(android.R.string.ok, null).setNeutralButton(R.string.activity_main_plugin_manager_import_plugin, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"), 3);
+							}
+						}
+					).setCancelable(false).show();
+					return true;
+				case R.id.activity_main_plugins:
+					return true;
+				default:
+					final File plugin = plugins[id - 1];
+					final StringBuilder js = new StringBuilder();
+					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(plugin)));
+					String line;
+					while ((line = br.readLine()) != null) js.append(line).append("\n");
+					br.close();
+					final WebView wv = new WebView(this);
+					new AlertDialog.Builder(this).setTitle(plugin.getName().substring(0, plugin.getName().lastIndexOf("."))).setView(wv).show();
+					WebSettings ws = wv.getSettings();
+					ws.setJavaScriptEnabled(true);
+					ws.setAllowContentAccess(true);
+					ws.setAllowFileAccess(true);
+					ws.setDomStorageEnabled(true);
+					ws.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+					wv.setWebViewClient(new WebViewClient() {
+							@Override
+							public void onPageFinished(WebView view, String url) {
+								wv.evaluateJavascript(js.toString(), null);
+							}
+						}
+					);
+					wv.setWebChromeClient(new WebChromeClient() {
+							@Override
+							public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+								new AlertDialog.Builder(MainActivity.this).setTitle(plugin.getName().substring(0, plugin.getName().lastIndexOf("."))).setMessage(message).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											result.confirm();
+										}
+									}
+								).show();
+								return true;
+							}
+							@Override
+							public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+								try {
+									if (jsFilePath != null) jsFilePath.onReceiveValue(null);
+									jsFilePath = filePathCallback;
+									startActivityForResult(fileChooserParams.createIntent(), 4);
+									return true;
+								} catch (ActivityNotFoundException e) {
+									filePathCallback.onReceiveValue(null);
+									return false;
+								}
+							}
+						}
+					);
+					wv.loadUrl("about:blank");
+					return true;
+			}
+		} catch (Exception e) {
+			catcher(e);
+		} finally {
+			return super.onOptionsItemSelected(item);
 		}
-		return super.onOptionsItemSelected(item);
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -326,23 +425,17 @@ public class MainActivity extends AppCompatActivity {
 				menu.getItem(i).setIcon(icon);
 			}
 		}
-		if (BuildConfig.DEBUG) {
-			menu.add("DEBUG");
-			menu.getItem(menu.size() - 1).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						String result = "";
-						for (File f : getFilesDir().listFiles()) {
-							result += f.getName() + "\n";
-							if (f.isDirectory()) for (File c : f.listFiles()) result += "    " + c.getName() + "\n";
-						}
-						new AlertDialog.Builder(MainActivity.this).setMessage(result).show();
-						return true;
-					}
-				}
-			);
+		MenuItem mi = menu.getItem(menu.size() - 1);
+		SubMenu sm = mi.getSubMenu();
+		for (int i = 0; i < plugins.length; i++) {
+			File f = plugins[i];
+			if (f.getName().toLowerCase().endsWith(".js")) sm.add(R.id.activity_main_plugins, i + 1, 0, f.getName().substring(0, f.getName().lastIndexOf(".")));
 		}
 		return super.onCreateOptionsMenu(menu);
+	}
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 	private void catcher(Exception e) {
 		for (File f : getCacheDir().listFiles()) f.delete();

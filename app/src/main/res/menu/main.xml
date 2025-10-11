@@ -27,9 +27,13 @@
 		android:title="@string/activity_main_save_properties"/>
 
 	<item
-		android:id="@+id/activity_main_settings"
-		android:showAsAction="ifRoom"
-		android:icon="@drawable/ic_settings"
-		android:title="@string/activity_main_settings"/>
+		android:id="@+id/activity_main_plugins"
+		android:title="@string/activity_main_plugins">
+		<menu>
+			<item
+				android:id="@+id/activity_main_plugin_manager"
+				android:title="@string/activity_main_plugin_manager"/>
+		</menu>
+	</item>
 
 </menu>
