@@ -39,14 +39,13 @@ import org.json.JSONObject;
 public class ChartListFragment extends Fragment {
 	public boolean loaded;
 	private Activity activity;
-	private List<Map<String, Object>> listData;
+	private List<Map<String, Object>> listData = new ArrayList<>();
 	private SimpleAdapter listAdapter;
 	private ListView list;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_chart_list, container, false);
 		activity = getActivity();
-		listData = new ArrayList<>();
 		listAdapter = new SimpleAdapter(activity, listData, R.layout.chart_list_item, new String[]{ "title", "description", "check" }, new int[]{ R.id.chart_list_item_title, R.id.chart_list_item_description, R.id.chart_list_item_check });
 		list = root.findViewById(R.id.fragment_chart_list_list);
 		list.setAdapter(listAdapter);
