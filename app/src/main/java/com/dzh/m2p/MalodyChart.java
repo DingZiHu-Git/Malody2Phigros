@@ -72,7 +72,7 @@ public class MalodyChart extends Chart {
 		JSONArray judgeLineList = new JSONArray();
 		JSONObject main = new JSONObject().put("Group", 0).put("Name", "main").put("Texture", "line.png").put("alphaControl", new JSONArray().put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 0d)).put(new JSONObject().put("alpha", 1d).put("easing", 1).put("x", 9999999d))).put("bpmfactor", 1d);
 		JSONArray mainSpeedEvents = new JSONArray();
-		if (cof.enableConst) mainSpeedEvents.put(new JSONObject().put("end", cof.defaultSpeed).put("endTime", new JSONArray().put(0).put(0).put(1)).put("linkgroup", 0).put("start", cof.defaultSpeed).put("startTime", new JSONArray().put(0).put(0).put(1)));
+		if (cof.enableConst) mainSpeedEvents.put(new JSONObject().put("end", cof.defaultSpeed).put("endTime", new JSONArray().put(1).put(0).put(1)).put("linkgroup", 0).put("start", cof.defaultSpeed).put("startTime", new JSONArray().put(0).put(0).put(1)));
 		else {
 			Fraction eoc = null;
 			for (int i = note.length() - 1; i > -1; i--) if (!note.getJSONObject(i).has("sound")) eoc = new Fraction(note.getJSONObject(i).getJSONArray("beat"));

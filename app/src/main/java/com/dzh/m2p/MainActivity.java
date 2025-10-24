@@ -273,8 +273,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		try {
-			int id = item.getItemId();
-			switch (id) {
+			switch (item.getItemId()) {
 				case R.id.activity_main_load_chart:
 					startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*"), 1);
 					return true;
@@ -356,58 +355,6 @@ public class MainActivity extends AppCompatActivity {
 						}
 					).setCancelable(false).show();
 					return true;
-				case R.id.activity_main_plugins:
-					return true;
-				default:
-					final File plugin = plugins[id - 1];
-					final StringBuilder js = new StringBuilder();
-					BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(plugin)));
-					String line;
-					while ((line = br.readLine()) != null) js.append(line).append("\n");
-					br.close();
-					final WebView wv = new WebView(this);
-					new AlertDialog.Builder(this).setTitle(plugin.getName().substring(0, plugin.getName().lastIndexOf("."))).setView(wv).show();
-					WebSettings ws = wv.getSettings();
-					ws.setJavaScriptEnabled(true);
-					ws.setAllowContentAccess(true);
-					ws.setAllowFileAccess(true);
-					ws.setDomStorageEnabled(true);
-					ws.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-					wv.setWebViewClient(new WebViewClient() {
-							@Override
-							public void onPageFinished(WebView view, String url) {
-								wv.evaluateJavascript(js.toString(), null);
-							}
-						}
-					);
-					wv.setWebChromeClient(new WebChromeClient() {
-							@Override
-							public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-								new AlertDialog.Builder(MainActivity.this).setTitle(plugin.getName().substring(0, plugin.getName().lastIndexOf("."))).setMessage(message).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialog, int which) {
-											result.confirm();
-										}
-									}
-								).show();
-								return true;
-							}
-							@Override
-							public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
-								try {
-									if (jsFilePath != null) jsFilePath.onReceiveValue(null);
-									jsFilePath = filePathCallback;
-									startActivityForResult(fileChooserParams.createIntent(), 4);
-									return true;
-								} catch (ActivityNotFoundException e) {
-									filePathCallback.onReceiveValue(null);
-									return false;
-								}
-							}
-						}
-					);
-					wv.loadUrl("about:blank");
-					return true;
 			}
 		} catch (Exception e) {
 			catcher(e);
@@ -429,8 +376,80 @@ public class MainActivity extends AppCompatActivity {
 		SubMenu sm = mi.getSubMenu();
 		for (int i = 0; i < plugins.length; i++) {
 			File f = plugins[i];
-			if (f.getName().toLowerCase().endsWith(".js")) sm.add(R.id.activity_main_plugins, i + 1, 0, f.getName().substring(0, f.getName().lastIndexOf(".")));
+			if (f.getName().toLowerCase().endsWith(".js")) sm.add(f.getName().substring(0, f.getName().lastIndexOf("."))).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+					@Override
+					public boolean onMenuItemClick(MenuItem item) {
+						try {
+							final File plugin = plugins[item.getOrder()];
+							final StringBuilder js = new StringBuilder();
+							BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(plugin)));
+							String line;
+							while ((line = br.readLine()) != null) js.append(line).append("\n");
+							br.close();
+							final WebView wv = new WebView(MainActivity.this);
+							new AlertDialog.Builder(MainActivity.this).setTitle(plugin.getName().substring(0, plugin.getName().lastIndexOf("."))).setView(wv).show();
+							WebSettings ws = wv.getSettings();
+							ws.setJavaScriptEnabled(true);
+							ws.setAllowContentAccess(true);
+							ws.setAllowFileAccess(true);
+							ws.setDomStorageEnabled(true);
+							ws.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+							wv.setWebViewClient(new WebViewClient() {
+									@Override
+									public void onPageFinished(WebView view, String url) {
+										wv.evaluateJavascript(js.toString(), null);
+									}
+								}
+							);
+							wv.setWebChromeClient(new WebChromeClient() {
+									@Override
+									public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+										new AlertDialog.Builder(MainActivity.this).setTitle(plugin.getName().substring(0, plugin.getName().lastIndexOf("."))).setMessage(message).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog, int which) {
+													result.confirm();
+												}
+											}
+										).show();
+										return true;
+									}
+									@Override
+									public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+										try {
+											if (jsFilePath != null) jsFilePath.onReceiveValue(null);
+											jsFilePath = filePathCallback;
+											startActivityForResult(fileChooserParams.createIntent(), 4);
+											return true;
+										} catch (ActivityNotFoundException e) {
+											filePathCallback.onReceiveValue(null);
+											return false;
+										}
+									}
+								}
+							);
+							wv.loadUrl("about:blank");
+							return true;
+						} catch (Exception e) {
+							catcher(e);
+							return false;
+						}
+					}
+				}
+			);
 		}
+		if (BuildConfig.DEBUG) menu.add("DEBUG").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					String str = "";
+					for (File f : getFilesDir().listFiles()) {
+						str += f.getName() + "\n";
+						if (f.isDirectory()) for (File c : f.listFiles()) str += "    " + c.getName() + "\n";
+					}
+					new AlertDialog.Builder(MainActivity.this).setMessage(str).show();
+					return true;
+				}
+			}
+		);
 		return super.onCreateOptionsMenu(menu);
 	}
 	@Override
