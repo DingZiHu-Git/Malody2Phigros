@@ -58,11 +58,13 @@ public class MainActivity extends AppCompatActivity {
 	private int count;
 	private File[] plugins;
 	private ValueCallback<Uri[]> jsFilePath;
+	private AndroidJSObject androidJSObject;
 	private void init() {
 		File settings = new File(getExternalFilesDir(null).getAbsolutePath() + File.separator + "settings.json");
 		if (settings.exists()) settings.delete();
 		plugins = getExternalFilesDir("plugins").listFiles();
 		wait = new WaitDialog(this);
+		androidJSObject = new AndroidJSObject(getApplicationContext());
 		if (new SimpleDateFormat("Md").format(System.currentTimeMillis()).equals("41")) new AlertDialog.Builder(this).setTitle(R.string.april_fools_dialog_title).setMessage(R.string.april_fools_dialog_message).setPositiveButton(R.string.april_fools_dialog_ok, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -145,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 			);
 			init();
 		} catch (Exception e) {
-			catcher(e);
+			AndroidJSObject.catcher(this, e);
 		}
 	}
 	private void load(final Uri data) {
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
 							if (oc.video != null) FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + oc.video, temp.getAbsolutePath() + File.separator + oc.video, new byte[1024 * 1024 * 4]);
 							FileUtil.copy(getCacheDir().getAbsolutePath() + File.separator + oc.sound, temp.getAbsolutePath() + File.separator + oc.sound, new byte[1024 * 1024 * 4]);
 						}
+						new File(temp.getAbsolutePath() + File.separator + "pack").createNewFile();
 					}
 				} else {
 					runOnUiThread(new Runnable() {
@@ -225,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
 				);
 			clf.refresh();
 		} catch (Exception e) {
-			catcher(e);
+			AndroidJSObject.catcher(this, e);
 		}
 	}
 	@Override
@@ -267,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
 					break;
 			}
 		} catch (Exception e) {
-			catcher(e);
+			AndroidJSObject.catcher(this, e);
 		}
 	}
 	@Override
@@ -289,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
 									clf.refresh();
 									wait.cancel();
 								} catch (Exception e) {
-									catcher(e);
+									AndroidJSObject.catcher(MainActivity.this, e);
 								}
 							}
 						}
@@ -316,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
 													es.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 													wait.cancel();
 												} catch (Exception e) {
-													catcher(e);
+													AndroidJSObject.catcher(MainActivity.this, e);
 												}
 											}
 										}
@@ -357,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
 					return true;
 			}
 		} catch (Exception e) {
-			catcher(e);
+			AndroidJSObject.catcher(this, e);
 		} finally {
 			return super.onOptionsItemSelected(item);
 		}
@@ -427,10 +430,11 @@ public class MainActivity extends AppCompatActivity {
 									}
 								}
 							);
+							wv.addJavascriptInterface(androidJSObject, "Android");
 							wv.loadUrl("about:blank");
 							return true;
 						} catch (Exception e) {
-							catcher(e);
+							AndroidJSObject.catcher(MainActivity.this, e);
 							return false;
 						}
 					}
@@ -455,26 +459,5 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-	}
-	private void catcher(Exception e) {
-		for (File f : getCacheDir().listFiles()) f.delete();
-		final StringWriter sw = new StringWriter();
-		e.printStackTrace(new PrintWriter(sw, true));
-		runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					new AlertDialog.Builder(MainActivity.this).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								((ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Malody2Phigros", sw.toString()));
-							}
-						}
-					).setNegativeButton(R.string.crash_cancel, null).setCancelable(false).show();
-				}
-			}
-		);
-		try {
-			sw.close();
-		} catch (Exception ignore) {}
 	}
 }

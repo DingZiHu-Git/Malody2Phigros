@@ -29,10 +29,6 @@
 	<string name="activity_minesweeper_time_used">Time used: </string>
 	<string name="activity_minesweeper_title">Minesweeper</string>
 	<string name="activity_rick_title">Get Rickrolled lol</string>
-	<string name="activity_settings_saf">SAF (Storage Access Framework)</string>
-	<string name="activity_settings_initial_folder">Initial folder: </string>
-	<string name="activity_settings_select_initial_folder">Select initial folder</string>
-	<string name="activity_settings_use_last_folder">Use last folder</string>
 	<string name="app_name">Malody2Phigros</string>
 	<string name="april_fools_dialog_title">Malody2Phigros has stopped being supported</string>
 	<string name="april_fools_dialog_message">New production has been released! Isn\'t it amazing? Press the LINK below to get one</string>
@@ -59,22 +55,18 @@
 	<string name="fragment_convertion_options_enable_luck">Enable luck mode</string>
 	<string name="fragment_convertion_options_fake_drag">Fake Drag</string>
 	<string name="fragment_convertion_options_general">General</string>
-	<string name="fragment_convertion_options_invisible_line_message">The Y pos you input will make the judge line invisible. This may cause the chart becoming unplayable. Are you sure to keep this value?</string>
-	<string name="fragment_convertion_options_invisible_line_yes">Yes, I want to keep it</string>
-	<string name="fragment_convertion_options_invisible_line_no">No, make it to default pls</string>
 	<string name="fragment_convertion_options_is_cover">Judge line cover</string>
-	<string name="fragment_convertion_options_negative_speed_message">You inputed a negative speed. This may cause the chart becoming unplayable. Are you sure to keep this value?</string>
-	<string name="fragment_convertion_options_negative_speed_yes">Yes, I want to keep it</string>
-	<string name="fragment_convertion_options_negative_speed_no">No, make it positive pls</string>
-	<string name="fragment_convertion_options_note">Note: Modify default note wide to 0 will make the converter ignore the wide property of all notes in the original chart. Jump effect convertion is not supported for now. Please use scroll or sv to replace them. osu!mania converter is still in developing.</string>
+	<string name="fragment_convertion_options_note">Note: Modify default note wide to 0 will make the converter ignore the wide property of all notes in the original chart. Jump effect convertion is not supported for now. Please use scroll or sv to replace them.</string>
 	<string name="fragment_convertion_options_slide_process_mode">Slide process mode: </string>
 	<string name="fragment_convertion_options_slide_mode_moving_hold">Convert to moving hold</string>
 	<string name="fragment_convertion_options_slide_mode_straight_hold">Convert to straight hold</string>
 	<string name="fragment_convertion_options_slide_mode_tap_with_drags">Convert to Tap+Drags</string>
 	<string name="fragment_faq_chart_packing_title">Why my converted chart is not packed? / Why my converted chart is .json format?</string>
 	<string name="fragment_faq_chart_packing_content">If the format of the chart you imported is .mc or .osu, you CANNOT get the packed chart; If not, you will need to long click the imported chart and enable the "Pack converted chart" option by yourself to get the packed chart.</string>
+	<string name="fragment_faq_drag_interval_title">What does the "Drag interval" option mean?</string>
+	<string name="fragment_faq_drag_interval_content">It means beat interval of drags. For some technical reasons, you can only modify the denominator part.</string>
 	<string name="fragment_faq_how_to_make_a_plugin_title">How to make a plugin?</string>
-	<string name="fragment_faq_how_to_make_a_plugin_content">The plugin system uses WebView to load plugins. The system only supports JavaScript to code a plugin for now. If you need to custom a user interface, please use document.body.innerHTML to modify the HTML content.</string>
+	<string name="fragment_faq_how_to_make_a_plugin_content">It\'s quite easy: You only need to use a text editor(or more advanced code editor) to code a JavaScript, then load it here.\nNote: The plugin system uses WebView to load plugins. The system only supports JavaScript to code a plugin for now. If you need to custom a user interface, please use document.body.innerHTML to modify the HTML content.</string>
 	<string name="please_wait">Please wait...</string>
 	<string name="unknown">Unknown</string>
 </resources>

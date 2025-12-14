@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import java.io.StringWriter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.text.Editable;
 
 public class ConvertionOptionsFragment extends Fragment {
 	public boolean enableConst = false;
@@ -46,7 +48,7 @@ public class ConvertionOptionsFragment extends Fragment {
 	public boolean enableDrag = true;
 	public boolean fakeDrag = true;
 	public int dragAlpha = 128;
-	public Fraction dragInterval = new Fraction(0, 1, 12);
+	public int dragInterval = 12;
 	public boolean optimizeChart = false;
 	private Activity activity;
 	private File properties;
@@ -62,20 +64,17 @@ public class ConvertionOptionsFragment extends Fragment {
 				}
 			}
 		);
-		final EditText defaultSpeedEditText = root.findViewById(R.id.fragment_convertion_options_default_speed);
-		((ImageButton) root.findViewById(R.id.fragment_convertion_options_default_speed_confirm)).setOnClickListener(new View.OnClickListener() {
+		EditText defaultSpeedEditText = root.findViewById(R.id.fragment_convertion_options_default_speed);
+		defaultSpeedEditText.addTextChangedListener(new TextWatcher() {
 				@Override
-				public void onClick(View v) {
-					defaultSpeed = Double.parseDouble(defaultSpeedEditText.getText().toString());
-					if (defaultSpeed < 0) new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_dialog_alert).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.fragment_convertion_options_negative_speed_message).setPositiveButton(R.string.fragment_convertion_options_negative_speed_yes, null).setNegativeButton(R.string.fragment_convertion_options_negative_speed_no, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								defaultSpeed = -defaultSpeed;
-								defaultSpeedEditText.setText(String.valueOf(defaultSpeed));
-							}
-						}
-					).setCancelable(false).show();
+				public void afterTextChanged(Editable s) {
+					String str = s.toString();
+					if (!(str.isEmpty() || str.equals("-") || str.equals("+"))) defaultSpeed = Double.parseDouble(s.toString());
 				}
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			}
 		);
 		Switch isCoverSwitch = root.findViewById(R.id.fragment_convertion_options_is_cover);
@@ -86,20 +85,17 @@ public class ConvertionOptionsFragment extends Fragment {
 				}
 			}
 		);
-		final EditText defaultYEditText = root.findViewById(R.id.fragment_convertion_options_default_y);
-		((ImageButton) root.findViewById(R.id.fragment_convertion_options_default_y_confirm)).setOnClickListener(new View.OnClickListener() {
+		EditText defaultYEditText = root.findViewById(R.id.fragment_convertion_options_default_y);
+		defaultYEditText.addTextChangedListener(new TextWatcher() {
 				@Override
-				public void onClick(View v) {
-					defaultY = Double.parseDouble(defaultYEditText.getText().toString());
-					if (defaultY < -450 || defaultY > 450) new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_dialog_alert).setTitle(android.R.string.dialog_alert_title).setMessage(R.string.fragment_convertion_options_invisible_line_message).setPositiveButton(R.string.fragment_convertion_options_invisible_line_yes, null).setNegativeButton(R.string.fragment_convertion_options_invisible_line_no, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								defaultY = -278.15;
-								defaultYEditText.setText(String.valueOf(defaultY));
-							}
-						}
-					).setCancelable(false).show();
+				public void afterTextChanged(Editable s) {
+					String str = s.toString();
+					if (!(str.isEmpty() || str.equals("-") || str.equals("+"))) defaultY = Double.parseDouble(s.toString());
 				}
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			}
 		);
 		Switch enableLuckSwitch = root.findViewById(R.id.fragment_convertion_options_enable_luck);
@@ -115,8 +111,7 @@ public class ConvertionOptionsFragment extends Fragment {
 		defaultWideSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-					defaultWide = progress;
-					defaultWideValue.setText(String.valueOf(defaultWide));
+					defaultWideValue.setText(String.valueOf(defaultWide = progress));
 				}
 				@Override
 				public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -124,7 +119,6 @@ public class ConvertionOptionsFragment extends Fragment {
 				public void onStopTrackingTouch(SeekBar seekBar) {}
 			}
 		);
-		defaultWideSeekBar.setMin(0);
 		defaultWideSeekBar.setMax(255);
 		defaultWideValue.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -135,7 +129,9 @@ public class ConvertionOptionsFragment extends Fragment {
 					new AlertDialog.Builder(activity).setTitle(R.string.fragment_convertion_options_default_wide).setView(et).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								defaultWideSeekBar.setProgress(Integer.parseInt(et.getText().toString()));
+								String s = et.getText().toString();
+								if (!s.isEmpty()) defaultWideSeekBar.setProgress(Integer.parseInt(s));
+								defaultWide = defaultWideSeekBar.getProgress();
 							}
 						}
 					).setNegativeButton(android.R.string.cancel, null).setCancelable(false).show();
@@ -155,7 +151,6 @@ public class ConvertionOptionsFragment extends Fragment {
 				}
 			}
 		);
-		slideProcessModeSpinner.setSelection(2);
 		Switch enableDragSwitch = root.findViewById(R.id.fragment_convertion_options_enable_drag);
 		enableDragSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
@@ -177,8 +172,7 @@ public class ConvertionOptionsFragment extends Fragment {
 		dragAlphaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-					dragAlpha = progress;
-					dragAlphaValue.setText(String.valueOf(dragAlpha));
+					dragAlphaValue.setText(String.valueOf(dragAlpha = progress));
 				}
 				@Override
 				public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -196,22 +190,26 @@ public class ConvertionOptionsFragment extends Fragment {
 					new AlertDialog.Builder(activity).setTitle(R.string.fragment_convertion_options_drag_alpha).setView(et).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								dragAlpha = Integer.parseInt(et.getText().toString());
-								dragAlphaSeekBar.setProgress(dragAlpha);
+								String s = et.getText().toString();
+								if (!s.isEmpty()) dragAlphaSeekBar.setProgress(Integer.parseInt(s));
+								dragAlpha = dragAlphaSeekBar.getProgress();
 							}
 						}
 					).setNegativeButton(android.R.string.cancel, null).setCancelable(false).show();
 				}
 			}
 		);
-		final EditText dragIntervalNum = root.findViewById(R.id.fragment_convertion_options_drag_interval_num);
-		final EditText dragIntervalUp = root.findViewById(R.id.fragment_convertion_options_drag_interval_up);
-		final EditText dragIntervalDown = root.findViewById(R.id.fragment_convertion_options_drag_interval_down);
-		((ImageButton) root.findViewById(R.id.fragment_convertion_options_drag_interval_confirm)).setOnClickListener(new View.OnClickListener() {
+		final EditText dragIntervalEditText = root.findViewById(R.id.fragment_convertion_options_drag_interval);
+		dragIntervalEditText.addTextChangedListener(new TextWatcher() {
 				@Override
-				public void onClick(View v) {
-					dragInterval = new Fraction(Integer.parseInt(dragIntervalNum.getText().toString()), Integer.parseInt(dragIntervalUp.getText().toString()), Integer.parseInt(dragIntervalDown.getText().toString()));
+				public void afterTextChanged(Editable s) {
+					String str = s.toString();
+					if (!str.isEmpty()) dragInterval = Math.max(1, Integer.parseInt(str));
 				}
+				@Override
+				public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+				@Override
+				public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			}
 		);
 		try {
@@ -234,13 +232,11 @@ public class ConvertionOptionsFragment extends Fragment {
 			enableDragSwitch.setChecked(enableDrag = prop.getBoolean("drag"));
 			fakeDragSwitch.setChecked(fakeDrag = prop.getBoolean("fake"));
 			dragAlphaSeekBar.setProgress(dragAlpha = prop.getInt("alpha"));
-			dragInterval = new Fraction(prop.getJSONArray("interval"));
-			dragIntervalNum.setText(String.valueOf(dragInterval.num));
-			dragIntervalUp.setText(String.valueOf(dragInterval.up));
-			dragIntervalDown.setText(String.valueOf(dragInterval.down));
+			dragInterval = prop.has("ver") && prop.getLong("ver") > 3 ? prop.getInt("interval") : prop.getJSONArray("interval").getInt(2);
+			dragIntervalEditText.setText(String.valueOf(dragInterval));
 			optimizeChart = prop.getBoolean("optimize");
 		} catch (Exception e) {
-			catcher(e);
+			AndroidJSObject.catcher(activity, e);
 		}
 		return root;
 	}
@@ -248,28 +244,7 @@ public class ConvertionOptionsFragment extends Fragment {
 		properties = new File(activity.getExternalFilesDir(null).getAbsolutePath() + File.separator + "properties.json");
 		properties.createNewFile();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(properties), "UTF-8"));
-		bw.write(new JSONObject().put("const", enableConst).put("speed", defaultSpeed).put("cover", isCover).put("y", defaultY).put("luck", enableLuck).put("wide", defaultWide).put("slide", slideProcessMode).put("drag", enableDrag).put("fake", fakeDrag).put("alpha", dragAlpha).put("interval", dragInterval.toJSONArray()).put("optimize", optimizeChart).toString());
+		bw.write(new JSONObject().put("ver", BuildConfig.VERSION_CODE).put("const", enableConst).put("speed", defaultSpeed).put("cover", isCover).put("y", defaultY).put("luck", enableLuck).put("wide", defaultWide).put("slide", slideProcessMode).put("drag", enableDrag).put("fake", fakeDrag).put("alpha", dragAlpha).put("interval", dragInterval).put("optimize", optimizeChart).toString());
 		bw.close();
-	}
-	private void catcher(Exception e) {
-		for (File f : activity.getCacheDir().listFiles()) f.delete();
-		final StringWriter sw = new StringWriter();
-		e.printStackTrace(new PrintWriter(sw, true));
-		activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								((ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Malody2Phigros", sw.toString()));
-							}
-						}
-					).setNegativeButton(R.string.crash_cancel, null).setCancelable(false).show();
-				}
-			}
-		);
-		try {
-			sw.close();
-		} catch (Exception ignore) {}
 	}
 }

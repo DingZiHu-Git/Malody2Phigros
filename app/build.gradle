@@ -8,8 +8,8 @@ android {
         applicationId "com.dzh.m2p"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 3
-        versionName "1.2.0"
+        versionCode 4
+        versionName "1.2.1"
     }
     buildTypes {
         release {

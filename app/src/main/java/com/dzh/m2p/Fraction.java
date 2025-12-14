@@ -7,46 +7,38 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 public class Fraction implements Comparable<Fraction> {
+	public static final Fraction ZERO = new Fraction();
 	private final double EPSILON = 1e-6;
-	public final int num;
-	public final int up;
-	public final int down;
+	public int num;
+	public int up;
+	public int down;
 	public Fraction() {
 		this(0, 0, 1);
 	}
 	public Fraction(int num, int up, int down) {
 		if (down == 0) throw new IllegalArgumentException("Denominator is zero");
-		int[] formatted = format(num, up, down);
-		this.num = formatted[0];
-		this.up = formatted[1];
-		this.down = formatted[2];
+		this.num = num;
+		this.up = up;
+		this.down = down;
 	}
 	public Fraction(String expression) {
 		String[] split1 = expression.split(":");
-		int tempNum = 0;
-		if (split1.length == 2) tempNum = Integer.parseInt(split1[0]);
+		if (split1.length == 2) num = Integer.parseInt(split1[0]);
 		String[] split2 = split1[split1.length - 1].split("/");
 		if (split2.length != 2) {
-			num = tempNum;
 			up = 0;
 			down = 1;
 			return;
 		}
-		int tempUp = Integer.parseInt(split2[0]);
-		int tempDown = Integer.parseInt(split2[1]);
-		if (tempDown == 0) throw new IllegalArgumentException("Denominator is zero");
-		int[] formatted = format(tempNum, tempUp, tempDown);
-		num = formatted[0];
-		up = formatted[1];
-		down = formatted[2];
+		up = Integer.parseInt(split2[0]);
+		down = Integer.parseInt(split2[1]);
+		if (down == 0) throw new IllegalArgumentException("Denominator is zero");
+		format();
 	}
 	public Fraction(JSONArray beat) throws JSONException {
 		this(beat.getInt(0), beat.getInt(1), beat.getInt(2));
 	}
 	public Fraction(double d) {
-		int tempNum = 0;
-		int tempUp;
-		int tempDown;
 		boolean negative = false;
 		if (d < 0) {
 			d = -d;
@@ -54,17 +46,14 @@ public class Fraction implements Comparable<Fraction> {
 		}
 		while (d >= 1) {
 			d--;
-			tempNum++;
+			num++;
 		}
 		for (int i = 1; ; i++) for (int j = 0; j < i; j++) {
 			if (EPSILON >= Math.abs(j / (double) i - d)) {
-				tempUp = j;
-				tempDown = i;
-				if (negative) tempNum = -tempNum;
-				int[] formatted = format(tempNum, tempUp, tempDown);
-				num = formatted[0];
-				up = formatted[1];
-				down = formatted[2];
+				up = j;
+				down = i;
+				if (negative) num = -num;
+				format();
 				return;
 			}
 		}
@@ -130,29 +119,26 @@ public class Fraction implements Comparable<Fraction> {
 	public String toString() {
 		return num + ":" + up + "/" + down;
 	}
-	public static int[] format(int num, int up, int down) {
+	public Fraction format() {
 		if (down == 0) throw new IllegalArgumentException("Denominator is zero");
 		if (down < 0) {
-			up = -up;
 			down = -down;
+			num = -num;
 		}
 		if (up < 0) {
-			int multiples = (-up + down - 1) / down;
-			num -= multiples;
-			up += multiples * down;
+			up = -up;
+			num = -num;
 		}
-		if (up >= down) {
-			int multiples = up / down;
-			num += multiples;
-			up -= multiples * down;
+		while (up >= down) {
+			num++;
+			up -= down;
 		}
 		int gcd = gcd(up, down);
 		up /= gcd;
 		down /= gcd;
-		if (up == 0) down = 1;
-		return new int[]{ num, up, down };
+		return this;
 	}
-	private static int gcd(int a, int b) {
+	private int gcd(int a, int b) {
 		if (b == 0) return a;
 		return gcd(b, a % b);
 	}

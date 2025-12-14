@@ -28,13 +28,14 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ChartListFragment extends Fragment {
 	public boolean loaded;
@@ -58,7 +59,7 @@ public class ChartListFragment extends Fragment {
 						f.renameTo(new File(f.getParent() + File.separator + ((boolean) map.get("check") ? f.getName() + ".disabled" : f.getName().substring(0, f.getName().lastIndexOf(".")))));
 						refresh();
 					} catch (Exception e) {
-						catcher(e);
+						AndroidJSObject.catcher(activity, e);
 					}
 				}
 			}
@@ -107,7 +108,7 @@ public class ChartListFragment extends Fragment {
 									f.renameTo(new File(f.getParent() + File.separator + et1.getText().toString() + extension));
 									refresh();
 								} catch (Exception e) {
-									catcher(e);
+									AndroidJSObject.catcher(activity, e);
 								}
 							}
 						}
@@ -120,7 +121,7 @@ public class ChartListFragment extends Fragment {
 									f.delete();
 									refresh();
 								} catch (Exception e) {
-									catcher(e);
+									AndroidJSObject.catcher(activity, e);
 								}
 							}
 						}
@@ -132,7 +133,7 @@ public class ChartListFragment extends Fragment {
 		try {
 			refresh();
 		} catch (Exception e) {
-			catcher(e);
+			AndroidJSObject.catcher(activity, e);
 		}
 		loaded = true;
 		return root;
@@ -168,7 +169,7 @@ public class ChartListFragment extends Fragment {
 							for (File f : temp.listFiles()) f.delete();
 							temp.delete();
 						} catch (Exception e) {
-							catcher(e);
+							AndroidJSObject.catcher(activity, e);
 						}
 					}
 				}
@@ -178,7 +179,7 @@ public class ChartListFragment extends Fragment {
 	}
 	public void refresh() throws IOException, JSONException {
 		listData.clear();
-		for (File f : activity.getFilesDir().listFiles()) {
+		for (File f : sort(activity.getFilesDir().listFiles())) {
 			boolean add = false;
 			Map<String, Object> map = new HashMap<>();
 			String name = f.getName();
@@ -239,25 +240,17 @@ public class ChartListFragment extends Fragment {
 		map.put("description", getString(R.string.fragment_chart_list_description_title) + oc.title + "\n" + getString(R.string.fragment_chart_list_description_artist) + oc.artist + "\n" + getString(R.string.fragment_chart_list_description_creator) + oc.creator + "\n" + getString(R.string.fragment_chart_list_description_mode) + (oc.mode == null ? getString(R.string.unknown) : oc.mode) + "\n" + getString(R.string.fragment_chart_list_description_version) + oc.version);
 		map.put("chart", oc);
 	}
-	private void catcher(Exception e) {
-		for (File f : activity.getCacheDir().listFiles()) f.delete();
-		final StringWriter sw = new StringWriter();
-		e.printStackTrace(new PrintWriter(sw, true));
-		activity.runOnUiThread(new Runnable() {
+	private List<File> sort(File... array){
+		List<File> file = Arrays.asList(array);
+		Collections.sort(file, new Comparator<File>(){
 				@Override
-				public void run() {
-					new AlertDialog.Builder(activity).setIcon(android.R.drawable.ic_delete).setTitle(R.string.crash_title).setMessage(sw.toString()).setPositiveButton(R.string.crash_ok, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								((ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("Malody2Phigros", sw.toString()));
-							}
-						}
-					).setNegativeButton(R.string.crash_cancel, null).setCancelable(false).show();
+				public int compare(File o1, File o2) {
+					if (o1.isDirectory() && o2.isFile()) return -1;
+					if (o1.isFile() && o2.isDirectory()) return 1;
+					return o1.getName().compareToIgnoreCase(o2.getName());
 				}
 			}
 		);
-		try {
-			sw.close();
-		} catch (Exception ignore) {}
+		return file;
 	}
 }

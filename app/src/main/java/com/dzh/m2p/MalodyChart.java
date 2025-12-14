@@ -156,7 +156,7 @@ public class MalodyChart extends Chart {
 							double v = (moveX - lastX) / target.subtract(lastBeat).toBigDecimal().doubleValue();
 							Fraction current = lastBeat;
 							while (current.compareTo(target) < 0) {
-								current = current.add(cof.dragInterval);
+								current = current.add(new Fraction(0, 1, cof.dragInterval));
 								notes.put(new JSONObject().put("above", 1).put("alpha", 255).put("endTime", beat.add(current).toJSONArray()).put("isFake", 0).put("positionX", x + (lastX + v * (current.subtract(lastBeat)).toBigDecimal().doubleValue()) / 127.5 * 675d).put("size", size).put("speed", 1d).put("startTime", beat.add(current).toJSONArray()).put("type", 4).put("visibleTime", 999999d).put("yOffset", 0d));
 							}
 							lastBeat = target;
@@ -178,7 +178,7 @@ public class MalodyChart extends Chart {
 								double v = (moveX - lastX) / target.subtract(lastBeat).toBigDecimal().doubleValue();
 								Fraction current = lastBeat;
 								while (current.compareTo(target) < 0) {
-									current = current.add(cof.dragInterval);
+									current = current.add(new Fraction(0, 1, cof.dragInterval));
 									if (cof.enableDrag) notes.put(new JSONObject().put("above", 1).put("alpha", cof.dragAlpha).put("endTime", beat.add(current).toJSONArray()).put("isFake", cof.fakeDrag ? 1 : 0).put("positionX", x + (lastX + v * (current.subtract(lastBeat)).toBigDecimal().doubleValue()) / 127.5 * 675d).put("size", size).put("speed", 1d).put("startTime", beat.add(current).toJSONArray()).put("type", 4).put("visibleTime", 999999d).put("yOffset", 0d));
 								}
 								lastBeat = target;
